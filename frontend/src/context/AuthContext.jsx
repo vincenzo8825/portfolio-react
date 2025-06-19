@@ -43,18 +43,43 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true)
       const response = await authService.login(credentials)
-      const { user: userData, token: authToken } = response
       
-      setUser(userData)
-      setToken(authToken)
-      setIsAuthenticated(true)
-      localStorage.setItem('auth-token', authToken)
-      
-      return { success: true }
+      // Laravel response structure: { success: true, data: { user: {}, token: '' } }
+      if (response.success && response.data) {
+        const { user: userData, token: authToken } = response.data
+        
+        setUser(userData)
+        setToken(authToken)
+        setIsAuthenticated(true)
+        
+        return { success: true }
+      } else {
+        return { 
+          success: false, 
+          message: response.message || 'Errore durante il login' 
+        }
+      }
     } catch (error) {
+      console.error('Login error in context:', error)
+      
+      // Handle different error types
+      let errorMessage = 'Errore durante il login'
+      
+      if (error.response?.status === 422) {
+        // Validation error - credentials wrong
+        errorMessage = 'Credenziali non valide. Verifica email e password.'
+      } else if (error.response?.status === 403) {
+        // Forbidden - not admin
+        errorMessage = 'Accesso negato. Solo gli amministratori possono accedere.'
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Errore durante il login' 
+        message: errorMessage
       }
     } finally {
       setIsLoading(false)

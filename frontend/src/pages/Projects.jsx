@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { projectsService } from '../services/projects'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useNotification } from '../context/NotificationContext'
 
 const Projects = () => {
   const [selectedFilter, setSelectedFilter] = useState('all')
@@ -17,9 +19,10 @@ const Projects = () => {
 
   const { user, isAuthenticated } = useAuth()
   const { language } = useLanguage()
+  const { showError } = useNotification()
 
   // Check if user is admin
-  const isAdmin = isAuthenticated && user?.role === 'admin'
+  const isAdmin = isAuthenticated && user?.is_admin
 
   // Translations
   const translations = {
@@ -120,178 +123,62 @@ const Projects = () => {
   const getText = (key) => translations[language]?.[key] || translations.it[key]
 
   useEffect(() => {
-    // Load projects - in real app this would come from API
     loadProjects()
   }, [])
 
   const loadProjects = async () => {
-    setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setProjects(demoProjects)
+    try {
+      setIsLoading(true)
+      const data = await projectsService.getAll()
+      setProjects(data)
+    } catch (error) {
+      console.error('Error loading projects:', error)
+      showError('Errore nel caricamento dei progetti')
+      setProjects([])
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
+  // Helper function to determine category based on technologies
+  const getProjectCategory = (technologies) => {
+    if (!technologies || technologies.length === 0) return 'other'
+    
+    const frontendTechs = ['React', 'Vue.js', 'JavaScript', 'TypeScript', 'Tailwind CSS', 'Bootstrap']
+    const backendTechs = ['Laravel', 'PHP', 'Node.js', 'Python']
+    
+    const hasFrontend = technologies.some(tech => frontendTechs.includes(tech))
+    const hasBackend = technologies.some(tech => backendTechs.includes(tech))
+    
+    if (hasFrontend && hasBackend) return 'fullstack'
+    if (hasFrontend) return 'frontend'
+    if (hasBackend) return 'backend'
+    return 'other'
+  }
 
-
-  // Demo projects data
-  const demoProjects = [
-    {
-      id: 1,
-      title: "E-Commerce Platform",
-      description: "Piattaforma e-commerce completa con gestione inventario, pagamenti e analytics",
-      category: "fullstack",
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-      technologies: ["React", "Laravel", "MySQL", "Stripe"],
-      features: ["Dashboard Admin", "Payment Gateway", "Real-time Inventory", "Analytics"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "Fashion Store",
-      duration: "3 mesi"
-    },
-    {
-      id: 2,
-      title: "Task Management App",
-      description: "App di gestione progetti con collaborazione in tempo reale e Kanban board",
-      category: "frontend",
-      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-      technologies: ["React", "Firebase", "Tailwind CSS", "Framer Motion"],
-      features: ["Real-time Collaboration", "Kanban Board", "Time Tracking", "Team Chat"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "Tech Startup",
-      duration: "2 mesi"
-    },
-    {
-      id: 3,
-      title: "Restaurant Website",
-      description: "Sito web per ristorante con sistema di prenotazioni e menu digitale",
-      category: "frontend",
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
-      technologies: ["Vue.js", "Node.js", "MongoDB", "Socket.io"],
-      features: ["Online Reservations", "Digital Menu", "Order System", "Reviews"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "La Bella Vista",
-      duration: "1.5 mesi"
-    },
-    {
-      id: 4,
-      title: "Healthcare Dashboard",
-      description: "Dashboard per clinica medica con gestione pazienti e appuntamenti",
-      category: "fullstack",
-      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=600&fit=crop",
-      technologies: ["Laravel", "Vue.js", "PostgreSQL", "Chart.js"],
-      features: ["Patient Management", "Appointment Scheduling", "Medical Records", "Analytics"],
-      status: "in-progress",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "MedClinic",
-      duration: "4 mesi"
-    },
-    {
-      id: 5,
-      title: "Portfolio Website",
-      description: "Portfolio personale con design moderno e animazioni interattive",
-      category: "frontend",
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&h=600&fit=crop",
-      technologies: ["React", "Tailwind CSS", "Framer Motion", "Vite"],
-      features: ["Modern Design", "Interactive Animations", "Dark Mode", "Responsive"],
-      status: "completed",
-      demo: "https://vincenzorocca.it",
-      github: "https://github.com/vincenzorocca",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "Personal",
-      duration: "1 mese"
-    },
-    {
-      id: 6,
-      title: "Learning Management System",
-      description: "Piattaforma LMS per corsi online con video, quiz e certificazioni",
-      category: "fullstack",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
-      technologies: ["Laravel", "React", "MySQL", "AWS S3"],
-      features: ["Video Streaming", "Quiz System", "Certificates", "Progress Tracking"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2023",
-      client: "EduTech",
-      duration: "5 mesi"
-    },
-    {
-      id: 7,
-      title: "Travel Booking Platform",
-      description: "Piattaforma di prenotazione viaggi con integrazione API e pagamenti",
-      category: "fullstack",
-      image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop",
-      technologies: ["React", "Express", "MongoDB", "Stripe"],
-      features: ["Flight Booking", "Hotel Reservations", "Payment Gateway", "Trip Planning"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2023",
-      client: "TravelCorp",
-      duration: "4 mesi"
-    },
-    {
-      id: 8,
-      title: "Fitness Tracker App",
-      description: "App per il tracciamento fitness con workouts personalizzati e statistiche",
-      category: "frontend",
-      image: "https://images.unsplash.com/photo-1571019613540-996a22c50833?w=800&h=600&fit=crop",
-      technologies: ["React Native", "Firebase", "Chart.js", "HealthKit"],
-      features: ["Workout Tracking", "Progress Charts", "Personal Trainer", "Social Features"],
-      status: "in-progress",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2024",
-      client: "FitLife",
-      duration: "3 mesi"
-    },
-    {
-      id: 9,
-      title: "Real Estate CRM",
-      description: "Sistema CRM per agenzia immobiliare con gestione clienti e proprietà",
-      category: "fullstack",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop",
-      technologies: ["Laravel", "Vue.js", "MySQL", "Google Maps API"],
-      features: ["Property Management", "Client Portal", "Virtual Tours", "Lead Generation"],
-      status: "completed",
-      demo: "https://demo.example.com",
-      github: "https://github.com/example",
-      linkedin: "https://linkedin.com/in/vincenzorocca",
-      year: "2023",
-      client: "RealEstate Pro",
-      duration: "6 mesi"
-    }
-  ]
+  // Enhanced projects with derived category
+  const enhancedProjects = projects.map(project => ({
+    ...project,
+    category: getProjectCategory(project.technologies),
+    demo: project.demo_url,
+    github: project.github_url,
+    linkedin: "https://linkedin.com/in/vincenzorocca", // Default value
+    year: project.project_date ? new Date(project.project_date).getFullYear() : new Date().getFullYear(),
+    client: "Portfolio Project", // Default value
+    duration: "Variable", // Default value
+    features: [], // Could be derived from long_description if needed
+    image: project.image_url
+  }))
 
   const filters = [
-    { id: 'all', label: getText('allProjects'), count: projects.length },
-    { id: 'fullstack', label: getText('fullStack'), count: projects.filter(p => p.category === 'fullstack').length },
-    { id: 'frontend', label: getText('frontend'), count: projects.filter(p => p.category === 'frontend').length },
-    { id: 'completed', label: getText('completed'), count: projects.filter(p => p.status === 'completed').length },
-    { id: 'inProgress', label: getText('inProgress'), count: projects.filter(p => p.status === 'in-progress').length }
+    { id: 'all', label: getText('allProjects'), count: enhancedProjects.length },
+    { id: 'fullstack', label: getText('fullStack'), count: enhancedProjects.filter(p => p.category === 'fullstack').length },
+    { id: 'frontend', label: getText('frontend'), count: enhancedProjects.filter(p => p.category === 'frontend').length },
+    { id: 'completed', label: getText('completed'), count: enhancedProjects.filter(p => p.status === 'completed').length },
+    { id: 'inProgress', label: getText('inProgress'), count: enhancedProjects.filter(p => p.status === 'in-progress').length }
   ]
 
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = enhancedProjects.filter(project => {
     if (selectedFilter === 'all') return true
     if (selectedFilter === 'completed') return project.status === 'completed'
     if (selectedFilter === 'inProgress') return project.status === 'in-progress'
@@ -326,8 +213,6 @@ const Projects = () => {
     }
     return colors[tech] || 'from-gray-400 to-gray-600'
   }
-
-
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -398,7 +283,7 @@ const Projects = () => {
 
   const ProjectCard = ({ project, index }) => (
     <div
-      className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl overflow-hidden shadow-xl shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-slate-700/50 hover:scale-105 transition-all duration-500"
+      className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl overflow-hidden shadow-xl shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-slate-700/50 hover:scale-105 transition-all duration-500 flex flex-col h-full"
       onMouseEnter={() => setHoveredProject(project.id)}
       onMouseLeave={() => setHoveredProject(null)}
       style={{ animationDelay: `${index * 100}ms` }}
@@ -407,9 +292,12 @@ const Projects = () => {
       <div className="relative h-32 sm:h-48 overflow-hidden">
         <Link to={`/projects/${project.id}`}>
           <img
-            src={project.image}
+            src={project.image || project.image_url || '/placeholder-image.jpg'}
             alt={project.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/600x400/3B82F6/ffffff?text=' + encodeURIComponent(project.title)
+            }}
           />
         </Link>
         
@@ -425,16 +313,20 @@ const Projects = () => {
         {/* Admin Actions */}
         {isAdmin && (
           <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex gap-2">
-            <button
-              onClick={() => window.location.href = `/admin/projects/edit/${project.id}`}
-              className="p-2 bg-blue-500/80 hover:bg-blue-600/80 text-white rounded-lg transition-colors duration-300 backdrop-blur-sm"
+            <Link
+              to={`/admin/projects/${project.id}/edit`}
+              className="p-2 bg-blue-500/80 hover:bg-blue-600/80 text-white rounded-lg transition-colors duration-300 backdrop-blur-sm z-10"
               title={getText('editProject')}
             >
               <i className="fas fa-edit text-sm"></i>
-            </button>
+            </Link>
             <button
-              onClick={() => setShowDeleteConfirm(project.id)}
-              className="p-2 bg-red-500/80 hover:bg-red-600/80 text-white rounded-lg transition-colors duration-300 backdrop-blur-sm"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setShowDeleteConfirm(project.id)
+              }}
+              className="p-2 bg-red-500/80 hover:bg-red-600/80 text-white rounded-lg transition-colors duration-300 backdrop-blur-sm z-10"
               title={getText('deleteProject')}
             >
               <i className="fas fa-trash text-sm"></i>
@@ -448,44 +340,39 @@ const Projects = () => {
         }`}>
           <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4">
             <div className="flex gap-1 sm:gap-2">
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
-              >
-                <i className="fas fa-external-link-alt mr-1"></i>
-                <span className="hidden sm:inline">{getText('demo')}</span>
-              </a>
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
-              >
-                <i className="fab fa-github mr-1"></i>
-                <span className="hidden sm:inline">{getText('code')}</span>
-              </a>
-              <a
-                href={project.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
-              >
-                <i className="fab fa-linkedin mr-1"></i>
-                <span className="hidden sm:inline">{getText('linkedin')}</span>
-              </a>
+              {project.demo && (
+                <a
+                  href={project.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
+                >
+                  <i className="fas fa-external-link-alt mr-1"></i>
+                  <span className="hidden sm:inline">{getText('demo')}</span>
+                </a>
+              )}
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
+                >
+                  <i className="fab fa-github mr-1"></i>
+                  <span className="hidden sm:inline">{getText('code')}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Project Content */}
-      <div className="p-4 sm:p-6">
+      {/* Project Content - Flex grow per riempire lo spazio */}
+      <div className="p-4 sm:p-6 flex flex-col flex-grow">
         {/* Project Meta */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm text-gray-500 dark:text-gray-400">{project.year}</span>
-          <span className="text-sm text-primary-600 dark:text-primary-400 font-medium">{project.client}</span>
+          <span className="text-sm text-primary-600 dark:text-primary-400 font-medium">{project.client || 'Portfolio Project'}</span>
         </div>
 
         {/* Title & Description */}
@@ -498,7 +385,7 @@ const Projects = () => {
           </h3>
         </Link>
         
-        <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed text-sm sm:text-base">
+        <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed text-sm sm:text-base line-clamp-3">
           {project.description}
         </p>
 
@@ -519,58 +406,58 @@ const Projects = () => {
           )}
         </div>
 
-        {/* Features */}
-        <div className="mb-4">
-          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">{getText('mainFeatures')}</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-            {project.features.slice(0, 4).map((feature, idx) => (
-              <div key={idx} className="flex items-center text-xs text-gray-600 dark:text-gray-300">
-                <i className="fas fa-check text-green-500 mr-2"></i>
-                {feature}
-              </div>
-            ))}
+        {/* Features - Solo se esistono */}
+        {project.features && project.features.length > 0 && (
+          <div className="mb-4">
+            <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">{getText('mainFeatures')}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+              {project.features.slice(0, 4).map((feature, idx) => (
+                <div key={idx} className="flex items-center text-xs text-gray-600 dark:text-gray-300">
+                  <i className="fas fa-check text-green-500 mr-2"></i>
+                  {feature}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-gray-200/50 dark:border-slate-700/50">
+        {/* Spacer per spingere il footer in basso */}
+        <div className="flex-grow"></div>
+
+        {/* Footer - Sempre in fondo */}
+        <div className="pt-4 border-t border-gray-200/50 dark:border-slate-700/50 mt-auto">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-500 dark:text-gray-400">
               <i className="fas fa-clock mr-1"></i>
-              {project.duration}
+              {project.duration || 'Variable'}
             </span>
             <div className="flex gap-2">
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
-                title={getText('viewDemo')}
-              >
-                <i className="fas fa-external-link-alt"></i>
-              </a>
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
-                title={getText('viewCode')}
-              >
-                <i className="fab fa-github"></i>
-              </a>
-              <a
-                href={project.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
-                title={getText('linkedin')}
-              >
-                <i className="fab fa-linkedin"></i>
-              </a>
+              {project.demo && (
+                <a
+                  href={project.demo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
+                  title={getText('viewDemo')}
+                >
+                  <i className="fas fa-external-link-alt"></i>
+                </a>
+              )}
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300"
+                  title={getText('viewCode')}
+                >
+                  <i className="fab fa-github"></i>
+                </a>
+              )}
             </div>
           </div>
           
-          {/* Details Button */}
+          {/* Details Button - Sempre in fondo */}
           <Link
             to={`/projects/${project.id}`}
             className="w-full inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium"
@@ -608,9 +495,12 @@ const Projects = () => {
             <div className="relative h-64 sm:h-80 overflow-hidden">
               <Link to={`/projects/${project.id}`}>
                 <img
-                  src={project.image}
+                  src={project.image || project.image_url || '/placeholder-image.jpg'}
                   alt={project.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/600x400/3B82F6/ffffff?text=' + encodeURIComponent(project.title)
+                  }}
                 />
               </Link>
               
@@ -786,9 +676,12 @@ const Projects = () => {
                   {/* Background Image */}
                   <div className="absolute inset-0">
                     <img
-                      src={project.image}
+                      src={project.image || project.image_url || '/placeholder-image.jpg'}
                       alt={project.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/600x400/3B82F6/ffffff?text=' + encodeURIComponent(project.title)
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
                   </div>
@@ -931,9 +824,12 @@ const Projects = () => {
         {/* Project Image */}
         <div className="relative w-full lg:w-64 xl:w-80 h-32 sm:h-40 lg:h-32 xl:h-40 flex-shrink-0 overflow-hidden rounded-2xl">
           <img
-            src={project.image}
+            src={project.image || project.image_url || '/placeholder-image.jpg'}
             alt={project.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/600x400/3B82F6/ffffff?text=' + encodeURIComponent(project.title)
+            }}
           />
           
           {/* Status Badge */}
@@ -1032,7 +928,7 @@ const Projects = () => {
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-white/80 dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium border border-gray-200/50 dark:border-slate-600/50"
+              className="inline-flex items-center px-4 py-2 bg-white dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium border border-gray-200 dark:border-slate-600/50"
             >
               <i className="fab fa-github mr-2"></i>
               {getText('viewCode')}
@@ -1313,8 +1209,6 @@ const Projects = () => {
           </div>
         </div>
       )}
-
-
 
     </div>
   )

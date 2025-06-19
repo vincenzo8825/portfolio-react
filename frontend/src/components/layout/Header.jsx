@@ -7,7 +7,10 @@ import { useAuth } from '../../context/AuthContext'
 const Header = ({ onToggleSidebar }) => {
   const { isDark, toggleTheme } = useTheme()
   const { t, toggleLanguage, language } = useLanguage()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
+  
+  // Stati per il dropdown admin
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false)
   
   // Orologio in tempo reale
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -25,6 +28,11 @@ const Header = ({ onToggleSidebar }) => {
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    setShowAdminDropdown(false)
   }
 
   return (
@@ -67,17 +75,101 @@ const Header = ({ onToggleSidebar }) => {
 
         {/* Actions con design premium */}
         <div className="flex items-center space-x-2">
-          {/* Login button - visibile solo se non autenticato */}
-          {!isAuthenticated && (
-            <Link
-              to="/login"
-              className="group relative px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500/10 to-accent-500/10 hover:from-primary-500/20 hover:to-accent-500/20 flex items-center text-primary-600 dark:text-primary-400 transition-all duration-300 hover:scale-105 font-medium text-sm shadow-lg hover:shadow-xl border border-primary-200/30 dark:border-primary-700/30"
-              aria-label="Accedi"
-            >
-              <i className="fas fa-sign-in-alt mr-2 text-sm group-hover:scale-110 transition-transform duration-300"></i>
-              <span className="hidden sm:inline">Admin</span>
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400/20 to-accent-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </Link>
+          {/* Admin dropdown - visibile solo se autenticato */}
+          {isAuthenticated && user?.is_admin ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                className="group relative px-4 py-2 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 hover:from-green-500/20 hover:to-emerald-500/20 flex items-center text-green-600 dark:text-green-400 transition-all duration-300 hover:scale-105 font-medium text-sm shadow-lg hover:shadow-xl border border-green-200/30 dark:border-green-700/30"
+              >
+                <i className="fas fa-user-shield mr-2 text-sm group-hover:scale-110 transition-transform duration-300"></i>
+                <span className="hidden sm:inline">Admin</span>
+                <i className={`fas fa-chevron-down ml-2 text-xs transition-transform duration-300 ${showAdminDropdown ? 'rotate-180' : ''}`}></i>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showAdminDropdown && (
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 py-2 z-50">
+                  {/* User Info */}
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                  </div>
+
+                  {/* Navigation Links */}
+                  <div className="py-1">
+                    <Link
+                      to="/admin"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-tachometer-alt mr-3 text-primary-500"></i>
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/admin/projects"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-folder mr-3 text-blue-500"></i>
+                      Gestione Progetti
+                    </Link>
+                    
+                    <div className="border-t border-gray-200 dark:border-slate-700 my-1"></div>
+                    
+                    {/* Portfolio Links */}
+                    <Link
+                      to="/"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-home mr-3 text-green-500"></i>
+                      Vedi Home Portfolio
+                    </Link>
+                    <Link
+                      to="/projects"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-briefcase mr-3 text-purple-500"></i>
+                      Vedi Pagina Progetti
+                    </Link>
+                    <Link
+                      to="/about"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-user mr-3 text-indigo-500"></i>
+                      Vedi About
+                    </Link>
+                    
+                    <div className="border-t border-gray-200 dark:border-slate-700 my-1"></div>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <i className="fas fa-sign-out-alt mr-3"></i>
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Login button - visibile solo se non autenticato */
+            !isAuthenticated && (
+              <Link
+                to="/login"
+                className="group relative px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500/10 to-accent-500/10 hover:from-primary-500/20 hover:to-accent-500/20 flex items-center text-primary-600 dark:text-primary-400 transition-all duration-300 hover:scale-105 font-medium text-sm shadow-lg hover:shadow-xl border border-primary-200/30 dark:border-primary-700/30"
+                aria-label="Accedi"
+              >
+                <i className="fas fa-sign-in-alt mr-2 text-sm group-hover:scale-110 transition-transform duration-300"></i>
+                <span className="hidden sm:inline">Admin</span>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400/20 to-accent-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </Link>
+            )
           )}
 
           {/* Language toggle */}
@@ -101,6 +193,14 @@ const Header = ({ onToggleSidebar }) => {
           </button>
         </div>
       </div>
+
+      {/* Overlay per chiudere il dropdown */}
+      {showAdminDropdown && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowAdminDropdown(false)}
+        ></div>
+      )}
     </header>
   )
 }

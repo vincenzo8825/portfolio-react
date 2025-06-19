@@ -42,11 +42,11 @@ const Login = () => {
         showSuccess('Login effettuato con successo!')
         navigate(from, { replace: true })
       } else {
-        showError(result.error || 'Errore durante il login')
+        showError(result.message || 'Credenziali non valide. Riprova.')
       }
     } catch (error) {
       console.error('Login error:', error)
-      showError('Errore di connessione. Riprova più tardi.')
+      showError('Credenziali non valide. Verifica email e password.')
     } finally {
       setIsLoading(false)
     }
@@ -84,7 +84,7 @@ const Login = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="admin@vincenzorocca.it"
+                placeholder="vincenzo@admin.it"
                 disabled={isLoading}
               />
             </div>
@@ -101,7 +101,7 @@ const Login = () => {
                 value={credentials.password}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="••••••••"
+                placeholder="admin123"
                 disabled={isLoading}
               />
             </div>
@@ -127,16 +127,16 @@ const Login = () => {
             </button>
           </div>
 
-          {/* Demo Credentials */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-6">
-            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
-              <i className="fas fa-info-circle mr-1"></i>
+          {/* Error message */}
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
+            <h4 className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-2">
+              <i className="fas fa-shield-alt mr-1"></i>
               Credenziali Demo
             </h4>
-            <p className="text-xs text-blue-700 dark:text-blue-400">
-              Email: admin@vincenzorocca.it<br />
-              Password: password123
-            </p>
+            <div className="text-xs text-amber-700 dark:text-amber-400 space-y-1">
+              <p><strong>Email:</strong> vincenzo@admin.it</p>
+              <p><strong>Password:</strong> admin123</p>
+            </div>
           </div>
 
           {/* Back to Home */}

@@ -1,55 +1,34 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { projectsService } from '../services/projects'
 import Hero from '../components/sections/Hero'
 import TechStack from '../components/sections/TechStack'
 
 const Home = () => {
   const [visibleStats, setVisibleStats] = useState(false)
+  const [featuredProjects, setFeaturedProjects] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const timer = setTimeout(() => setVisibleStats(true), 500)
+    loadFeaturedProjects()
     return () => clearTimeout(timer)
   }, [])
 
-  // Featured projects - in real app this would come from API filtering by featured: true
-  const featuredProjects = [
-    {
-      id: 1,
-      title: "E-Commerce Platform",
-      description: "Piattaforma e-commerce completa con gestione inventario, pagamenti e analytics avanzata.",
-      tech: ["React", "Laravel", "MySQL", "Stripe"],
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop",
-      status: "completed",
-      year: "2024",
-      featured: true,
-      demo: "https://demo.example.com",
-      github: "https://github.com/example"
-    },
-    {
-      id: 2,
-      title: "Task Management App",
-      description: "Applicazione per la gestione progetti con team collaboration e analytics.",
-      tech: ["Vue.js", "Node.js", "MongoDB", "Socket.io"],
-      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop",
-      status: "in-progress",
-      year: "2024",
-      featured: true,
-      demo: "https://demo2.example.com",
-      github: "https://github.com/example2"
-    },
-    {
-      id: 3,
-      title: "Learning Management System",
-      description: "Piattaforma educativa con corsi online, quiz interattivi e certificazioni.",
-      tech: ["React", "Laravel", "MySQL", "Firebase"],
-      image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&h=400&fit=crop",
-      status: "completed",
-      year: "2024",
-      featured: true,
-      demo: "https://demo3.example.com",
-      github: "https://github.com/example3"
+  const loadFeaturedProjects = async () => {
+    try {
+      setLoading(true)
+      const projects = await projectsService.getAll()
+      // Filtra solo progetti featured e prendi i primi 3
+      const featured = projects.filter(project => project.featured).slice(0, 3)
+      setFeaturedProjects(featured)
+    } catch (error) {
+      console.error('Error loading featured projects:', error)
+      setFeaturedProjects([]) // Fallback a array vuoto
+    } finally {
+      setLoading(false)
     }
-  ].filter(project => project.featured) // Only show featured projects
+  }
 
   const stats = [
     { label: "Progetti Completati", value: "50+", icon: "fas fa-check-circle", color: "from-green-500 to-emerald-500" },
@@ -158,91 +137,133 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project) => (
-              <div
-                key={project.id}
-                className="group relative bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl shadow-black/10 dark:shadow-black/30 border border-gray-100 dark:border-slate-700 hover:scale-105 transition-all duration-500"
-              >
-                {/* Project Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  
-                  {/* Status Badge */}
-                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${
-                    project.status === 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                    project.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                    'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                  } backdrop-blur-sm`}>
-                    {project.status === 'completed' ? 'Completato' : 
-                     project.status === 'in-progress' ? 'In Corso' : 'In Pausa'}
+          {loading ? (
+            /* Loading State */
+            <div className="flex justify-center items-center py-20">
+              <div className="spinner mr-4"></div>
+              <span className="text-gray-600 dark:text-gray-400">Caricamento progetti...</span>
+            </div>
+          ) : featuredProjects.length > 0 ? (
+            /* Projects Grid */
+            <div className="grid lg:grid-cols-3 gap-8">
+              {featuredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="group relative bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl shadow-black/10 dark:shadow-black/30 border border-gray-100 dark:border-slate-700 hover:scale-105 transition-all duration-500"
+                >
+                  {/* Project Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    {project.image_url ? (
+                      <img
+                        src={project.image_url || '/placeholder-image.jpg'}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/600x400/3B82F6/ffffff?text=' + encodeURIComponent(project.title)
+                      }}
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/20 dark:to-accent-900/20 flex items-center justify-center">
+                        <i className="fas fa-image text-4xl text-primary-400 dark:text-primary-600"></i>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    
+                    {/* Status Badge */}
+                    <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${
+                      project.status === 'completed' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                      project.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                      'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                    } backdrop-blur-sm`}>
+                      {project.status === 'completed' ? 'Completato' : 
+                       project.status === 'in-progress' ? 'In Corso' : 'In Pausa'}
+                    </div>
+
+                    {/* Featured Badge */}
+                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 backdrop-blur-sm flex items-center">
+                      <i className="fas fa-star mr-1"></i>
+                      In Evidenza
+                    </div>
+
+                    {/* Year */}
+                    {project.project_date && (
+                      <div className="absolute bottom-4 left-4 text-white/80 text-sm font-medium">
+                        {new Date(project.project_date).getFullYear()}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Featured Badge */}
-                  <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 backdrop-blur-sm flex items-center">
-                    <i className="fas fa-star mr-1"></i>
-                    In Evidenza
-                  </div>
+                  {/* Project Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
+                      {project.title}
+                    </h3>
+                    
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3">
+                      {project.description}
+                    </p>
 
-                  {/* Year */}
-                  <div className="absolute bottom-4 left-4 text-white/80 text-sm font-medium">
-                    {project.year}
-                  </div>
-                </div>
+                    {/* Tech Stack */}
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project.technologies.slice(0, 4).map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className="px-3 py-1 bg-gradient-to-r from-primary-500/10 to-accent-500/10 text-primary-700 dark:text-primary-300 text-xs rounded-full border border-primary-200/30 dark:border-primary-700/30"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                        {project.technologies.length > 4 && (
+                          <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
+                            +{project.technologies.length - 4}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-                {/* Project Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
-                    {project.title}
-                  </h3>
-                  
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  {/* Tech Stack */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tech.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-3 py-1 bg-gradient-to-r from-primary-500/10 to-accent-500/10 text-primary-700 dark:text-primary-300 text-xs rounded-full border border-primary-200/30 dark:border-primary-700/30"
+                    {/* Action Buttons */}
+                    <div className="flex gap-3">
+                      <Link
+                        to={`/projects/${project.slug || project.id}`}
+                        className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-2xl font-medium hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 group-hover:scale-105 text-center"
                       >
-                        {tech}
-                      </span>
-                    ))}
+                        Dettagli
+                        <i className="fas fa-info-circle ml-2"></i>
+                      </Link>
+                      {project.demo_url && (
+                        <a
+                          href={project.demo_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-2xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg border border-gray-200 dark:border-slate-600"
+                          title="Vedi Demo"
+                        >
+                          <i className="fas fa-external-link-alt"></i>
+                        </a>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-3">
-                    <Link
-                      to={`/projects/${project.id}`}
-                      className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-2xl font-medium hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 group-hover:scale-105 text-center"
-                    >
-                      Dettagli
-                      <i className="fas fa-info-circle ml-2"></i>
-                    </Link>
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-2xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg border border-gray-200 dark:border-slate-600"
-                      title="Vedi Demo"
-                    >
-                      <i className="fas fa-external-link-alt"></i>
-                    </a>
-                  </div>
+                  {/* Hover glow effect */}
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary-500/5 to-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
-
-                {/* Hover glow effect */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary-500/5 to-accent-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              ))}
+            </div>
+          ) : (
+            /* Empty State */
+            <div className="text-center py-20">
+              <div className="w-24 h-24 mx-auto mb-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                <i className="fas fa-folder-open text-3xl text-gray-400"></i>
               </div>
-            ))}
-          </div>
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                Nessun progetto in evidenza
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                I progetti saranno visibili qui una volta creati e messi in evidenza.
+              </p>
+            </div>
+          )}
 
           {/* View All Projects Button */}
           <div className="text-center mt-12">

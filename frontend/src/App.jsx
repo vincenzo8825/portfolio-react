@@ -13,7 +13,6 @@ import Login from './pages/Login'
 import Dashboard from './pages/admin/Dashboard'
 import ProjectsList from './pages/admin/ProjectsList'
 import ProjectForm from './pages/admin/ProjectForm'
-import ProjectEdit from './pages/admin/ProjectEdit'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import AOS from 'aos'
@@ -63,9 +62,9 @@ function App() {
                       <ProjectForm />
                     </ProtectedRoute>
                   } />
-                  <Route path="/admin/projects/edit/:id" element={
+                  <Route path="/admin/projects/:id/edit" element={
                     <ProtectedRoute>
-                      <ProjectEdit />
+                      <ProjectForm />
                     </ProtectedRoute>
                   } />
                   

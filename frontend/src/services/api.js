@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+// Base API configuration - Updated for Laravel backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +9,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: true
+  withCredentials: false // Laravel Sanctum with SPA doesn't need cookies
 })
 
 // Request interceptor to add auth token
@@ -55,6 +55,78 @@ export const apiService = {
   put: (url, data = {}, config = {}) => api.put(url, data, config),
   patch: (url, data = {}, config = {}) => api.patch(url, data, config),
   delete: (url, config = {}) => api.delete(url, config)
+}
+
+// File upload methods
+export const uploadService = {
+  // Upload single image
+  async uploadImage(imageFile) {
+    const formData = new FormData()
+    formData.append('image', imageFile)
+    
+    const response = await apiService.post('/admin/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      return response.data.data
+    } else {
+      throw new Error(response.data.message || 'Failed to upload image')
+    }
+  },
+
+  // Upload video
+  async uploadVideo(videoFile) {
+    const formData = new FormData()
+    formData.append('video', videoFile)
+    
+    const response = await apiService.post('/admin/upload/video', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      return response.data.data
+    } else {
+      throw new Error(response.data.message || 'Failed to upload video')
+    }
+  },
+
+  // Upload multiple images for gallery
+  async uploadGallery(imageFiles) {
+    const formData = new FormData()
+    imageFiles.forEach((file, index) => {
+      formData.append(`images[${index}]`, file)
+    })
+    
+    const response = await apiService.post('/admin/upload/gallery', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (response.data.success) {
+      return response.data.data
+    } else {
+      throw new Error(response.data.message || 'Failed to upload gallery')
+    }
+  },
+
+  // Delete file
+  async deleteFile(filePath) {
+    const response = await apiService.delete('/admin/upload/file', {
+      data: { path: filePath }
+    })
+    
+    if (response.data.success) {
+      return response.data
+    } else {
+      throw new Error(response.data.message || 'Failed to delete file')
+    }
+  }
 }
 
 export default api 

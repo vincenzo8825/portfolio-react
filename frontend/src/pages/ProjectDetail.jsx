@@ -1,104 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { projectsService } from '../services/projects'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import { useNotification } from '../context/NotificationContext'
 
 const ProjectDetail = () => {
   const { id } = useParams()
   const { user } = useAuth()
   const { language } = useLanguage()
+  const { showError } = useNotification()
   const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
-
-  // Mock project data - in real app this would be fetched from API
-  const mockProject = {
-    id: parseInt(id),
-    title: "E-Commerce Platform Avanzata",
-    description: "Una piattaforma e-commerce completa costruita con tecnologie moderne, featuring gestione inventario avanzata, sistema di pagamenti multipli, analytics in tempo reale e dashboard amministrativa.",
-    longDescription: `
-      Questo progetto rappresenta una soluzione e-commerce all'avanguardia progettata per gestire migliaia di prodotti e utenti simultanei. 
-      La piattaforma integra le migliori pratiche di sviluppo moderno con un focus particolare su performance, sicurezza e user experience.
-      
-      Il sistema include funzionalità avanzate come raccomandazioni AI-powered, gestione multilingua, 
-      ottimizzazione SEO automatica e integrazione completa con servizi di terze parti.
-    `,
-    category: "E-Commerce",
-    client: "TechStart Solutions",
-    duration: "4 mesi",
-    year: "2024",
-    status: "completed",
-    featured: true,
-    tech: ["React", "Laravel", "MySQL", "Redis", "Stripe", "AWS", "Docker"],
-    images: [
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=800&fit=crop"
-    ],
-    video: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Example video URL
-    demo: "https://demo.example.com",
-    github: "https://github.com/example",
-    features: [
-      "Sistema di autenticazione multi-fattore",
-      "Dashboard analytics in tempo reale", 
-      "Gestione inventario automatizzata",
-      "Sistema di pagamenti multipli (Stripe, PayPal)",
-      "Raccomandazioni AI-powered",
-      "App mobile responsive",
-      "Sistema di reviews e rating",
-      "Gestione multilingua (5 lingue)",
-      "SEO optimization automatica",
-      "Sistema di notifiche push"
-    ],
-    challenges: [
-      {
-        title: "Scalabilità del Database",
-        description: "Gestire migliaia di prodotti e transazioni simultanee richiedeva un'architettura database ottimizzata.",
-        solution: "Implementazione di Redis per caching, query optimization e database sharding per distribuire il carico."
-      },
-      {
-        title: "Performance Frontend",
-        description: "Garantire tempi di caricamento rapidi con una grande quantità di immagini e dati.",
-        solution: "Code splitting, lazy loading, CDN implementation e ottimizzazione delle immagini con WebP format."
-      },
-      {
-        title: "Sicurezza Pagamenti",
-        description: "Implementare un sistema di pagamenti sicuro conforme agli standard PCI DSS.",
-        solution: "Integrazione diretta con Stripe, tokenizzazione dei dati sensibili e audit di sicurezza completi."
-      }
-    ],
-    results: [
-      {
-        metric: "Performance",
-        value: "95%",
-        description: "Score Google PageSpeed Insights"
-      },
-      {
-        metric: "Conversioni",
-        value: "+340%",
-        description: "Aumento del tasso di conversione"
-      },
-      {
-        metric: "Tempo di Caricamento",
-        value: "1.2s",
-        description: "Tempo medio di caricamento pagina"
-      },
-      {
-        metric: "Uptime",
-        value: "99.9%",
-        description: "Disponibilità del sistema"
-      }
-    ],
-    testimonial: {
-      text: "Il lavoro di Vincenzo ha superato ogni nostra aspettativa. La piattaforma è performante, sicura e ha migliorato drasticamente le nostre vendite online.",
-      author: "Marco Rossi",
-      role: "CEO, TechStart Solutions",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100"
-    }
-  }
 
   const translations = {
     it: {
@@ -121,7 +36,11 @@ const ProjectDetail = () => {
       editProject: "Modifica Progetto",
       completed: "Completato",
       inProgress: "In Corso",
-      onHold: "In Pausa"
+      onHold: "In Pausa",
+      description: "Descrizione",
+      projectDate: "Data Progetto",
+      noImage: "Nessuna immagine disponibile",
+      errorLoading: "Errore nel caricamento del progetto"
     },
     en: {
       loading: "Loading...",
@@ -143,34 +62,82 @@ const ProjectDetail = () => {
       editProject: "Edit Project",
       completed: "Completed",
       inProgress: "In Progress",
-      onHold: "On Hold"
+      onHold: "On Hold",
+      description: "Description",
+      projectDate: "Project Date",
+      noImage: "No image available",
+      errorLoading: "Error loading project"
     }
   }
 
   const getText = (key) => translations[language]?.[key] || translations.it[key]
 
   useEffect(() => {
-    // Simulate API call
     const fetchProject = async () => {
-      setLoading(true)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      setProject(mockProject)
-      setLoading(false)
+      try {
+        console.log('Fetching project with ID:', id)
+        setLoading(true)
+        const projectData = await projectsService.getById(id)
+        console.log('Project data received:', projectData)
+        
+        // Use real data from database instead of mock data
+        const enhancedProject = {
+          ...projectData,
+          // Images - use gallery if available, otherwise fallback to single image
+          images: projectData.gallery && projectData.gallery.length > 0 
+            ? projectData.gallery 
+            : (projectData.image_url ? [projectData.image_url] : []),
+          // Technologies
+          tech: projectData.technologies || [],
+          // URLs
+          demo: projectData.demo_url,
+          github: projectData.github_url,
+          // Descriptions
+          longDescription: projectData.long_description || projectData.description,
+          // Project details from database
+          client: projectData.client || "Portfolio Project",
+          duration: projectData.duration || "Variable",
+          category: projectData.category || "Web Development",
+          // Arrays from database
+          features: projectData.features || [],
+          challenges: projectData.challenges || [],
+          results: projectData.results || [],
+          // Additional data
+          video: projectData.video_url,
+          additionalLinks: projectData.additional_links || []
+        }
+        
+        console.log('Enhanced project:', enhancedProject)
+        setProject(enhancedProject)
+      } catch (error) {
+        console.error('Error fetching project:', error)
+        console.error('Error details:', error.response?.data || error.message)
+        showError(translations[language]?.errorLoading || translations.it.errorLoading)
+        setProject(null)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    fetchProject()
-  }, [id])
+    if (id) {
+      fetchProject()
+    }
+  }, [id, showError, language])
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === project.images.length - 1 ? 0 : prev + 1
-    )
+    if (project && project.images && project.images.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === project.images.length - 1 ? 0 : prev + 1
+      )
+    }
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? project.images.length - 1 : prev - 1
-    )
+    if (project && project.images && project.images.length > 0) {
+      setCurrentImageIndex((prev) => 
+        prev === 0 ? project.images.length - 1 : prev - 1
+      )
+    }
   }
 
   const getStatusColor = (status) => {
@@ -179,7 +146,7 @@ const ProjectDetail = () => {
         return 'bg-green-500/20 text-green-400 border-green-500/30'
       case 'in-progress':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'on-hold':
+      case 'paused':
         return 'bg-orange-500/20 text-orange-400 border-orange-500/30'
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
@@ -192,7 +159,7 @@ const ProjectDetail = () => {
         return getText('completed')
       case 'in-progress':
         return getText('inProgress')
-      case 'on-hold':
+      case 'paused':
         return getText('onHold')
       default:
         return status
@@ -383,124 +350,148 @@ const ProjectDetail = () => {
                 </div>
               </div>
 
-              {/* Challenges and Solutions - RESTYLED */}
-              <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
-                <h2 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
-                    <i className="fas fa-lightbulb text-white text-sm"></i>
-                  </div>
-                  {getText('challenges')}
-                </h2>
-                <div className="space-y-8">
-                  {project.challenges.map((challenge, index) => (
-                    <div key={index} className="group relative">
-                      {/* Challenge Card */}
-                      <div className="bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-red-900/10 dark:via-orange-900/10 dark:to-yellow-900/10 rounded-2xl p-6 border border-red-100 dark:border-red-800/30 hover:shadow-lg transition-all duration-300">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                            <i className="fas fa-exclamation-triangle text-white text-sm"></i>
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">
-                              🚧 Sfida: {challenge.title}
-                            </h3>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                              {challenge.description}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Arrow Connector */}
-                      <div className="flex justify-center my-4">
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center animate-bounce">
-                          <i className="fas fa-arrow-down text-white text-sm"></i>
-                        </div>
-                      </div>
-
-                      {/* Solution Card */}
-                      <div className="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/10 dark:via-emerald-900/10 dark:to-teal-900/10 rounded-2xl p-6 border border-green-100 dark:border-green-800/30 hover:shadow-lg transition-all duration-300">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                            <i className="fas fa-check-circle text-white text-sm"></i>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">
-                              💡 Soluzione Implementata
-                            </h4>
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                              {challenge.solution}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Decorative line */}
-                      {index < project.challenges.length - 1 && (
-                        <div className="flex justify-center my-8">
-                          <div className="w-px h-8 bg-gradient-to-b from-gray-300 to-transparent dark:from-gray-600"></div>
-                        </div>
-                      )}
+              {/* Challenges and Solutions */}
+              {project.challenges && project.challenges.length > 0 && (
+                <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
+                      <i className="fas fa-lightbulb text-white text-sm"></i>
                     </div>
-                  ))}
+                    {getText('challenges')}
+                  </h2>
+                  <div className="space-y-4">
+                    {project.challenges.map((challenge, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/30">
+                        <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <i className="fas fa-lightbulb text-white text-sm"></i>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {challenge}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Results */}
+              {project.results && project.results.length > 0 && (
+                <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-3">
+                      <i className="fas fa-trophy text-white text-sm"></i>
+                    </div>
+                    Risultati Ottenuti
+                  </h2>
+                  <div className="space-y-4">
+                    {project.results.map((result, index) => (
+                      <div key={index} className="flex items-start space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl border border-green-100 dark:border-green-800/30">
+                        <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <i className="fas fa-trophy text-white text-sm"></i>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {result}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Image Gallery */}
-              <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
-                <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-                  {getText('projectGallery')}
-                </h2>
-                
-                {/* Main Gallery Image */}
-                <div className="relative h-96 rounded-2xl overflow-hidden mb-6">
-                  <img
-                    src={project.images[currentImageIndex]}
-                    alt={`${project.title} - Image ${currentImageIndex + 1}`}
-                    className="w-full h-full object-cover"
-                  />
+              {project.images && project.images.length > 0 && (
+                <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+                    {getText('projectGallery')}
+                  </h2>
                   
-                  {/* Navigation Arrows */}
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
-                  >
-                    <i className="fas fa-chevron-left"></i>
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
-                  >
-                    <i className="fas fa-chevron-right"></i>
-                  </button>
+                  {/* Main Gallery Image */}
+                  <div className="relative h-96 rounded-2xl overflow-hidden mb-6">
+                    <img
+                      src={project.images[currentImageIndex] || '/placeholder-image.jpg'}
+                      alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = '/placeholder-image.jpg'
+                      }}
+                    />
+                    
+                    {/* Navigation Arrows - Solo se più di un'immagine */}
+                    {project.images.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+                        >
+                          <i className="fas fa-chevron-left"></i>
+                        </button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+                        >
+                          <i className="fas fa-chevron-right"></i>
+                        </button>
 
-                  {/* Image Counter */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-                    {currentImageIndex + 1} / {project.images.length}
+                        {/* Image Counter */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
+                          {currentImageIndex + 1} / {project.images.length}
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Thumbnail Gallery - Solo se più di un'immagine */}
+                  {project.images.length > 1 && (
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {project.images.map((image, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                            index === currentImageIndex 
+                              ? 'border-primary-500 scale-105' 
+                              : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src = '/placeholder-image.jpg'
+                            }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Video Section */}
+              {project.video && (
+                <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-gray-100 dark:border-slate-700">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-3">
+                      <i className="fas fa-play text-white text-sm"></i>
+                    </div>
+                    Video Dimostrativo
+                  </h2>
+                  
+                  <div className="relative pt-[56.25%] rounded-2xl overflow-hidden">
+                    <video
+                      className="absolute inset-0 w-full h-full object-cover"
+                      controls
+                      poster={project.images && project.images[0] ? project.images[0] : undefined}
+                    >
+                      <source src={project.video} type="video/mp4" />
+                      Il tuo browser non supporta il tag video.
+                    </video>
                   </div>
                 </div>
+              )}
 
-                {/* Thumbnail Gallery */}
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {project.images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                        index === currentImageIndex 
-                          ? 'border-primary-500 scale-105' 
-                          : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
-                      }`}
-                    >
-                      <img
-                        src={image}
-                        alt={`Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
+
             </div>
 
             {/* Sidebar */}
