@@ -20,6 +20,7 @@ const ProjectForm = () => {
     image_url: '',
     demo_url: '',
     github_url: '',
+    linkedin_url: '',
     video_url: '',
     technologies: [],
     status: 'in-progress',
@@ -73,6 +74,7 @@ const ProjectForm = () => {
         image_url: project.image_url || '',
         demo_url: project.demo_url || '',
         github_url: project.github_url || '',
+        linkedin_url: project.linkedin_url || '',
         video_url: project.video_url || '',
         technologies: project.technologies || [],
         status: project.status || 'in-progress',
@@ -604,6 +606,21 @@ const ProjectForm = () => {
                   onChange={handleChange}
                   className="form-input"
                   placeholder="https://github.com/username/repo"
+                />
+              </div>
+
+              {/* LinkedIn URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  URL LinkedIn
+                </label>
+                <input
+                  type="url"
+                  name="linkedin_url"
+                  value={formData.linkedin_url}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="https://linkedin.com/in/username"
                 />
               </div>
 

@@ -19,6 +19,7 @@ class Project extends Model
         'gallery',
         'demo_url',
         'github_url',
+        'linkedin_url',
         'video_url',
         'technologies',
         'status',

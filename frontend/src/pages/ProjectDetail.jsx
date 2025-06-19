@@ -92,6 +92,7 @@ const ProjectDetail = () => {
           // URLs
           demo: projectData.demo_url,
           github: projectData.github_url,
+          linkedin: projectData.linkedin_url,
           // Descriptions
           longDescription: projectData.long_description || projectData.description,
           // Project details from database
@@ -254,7 +255,7 @@ const ProjectDetail = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-4">
-                {project.demo && (
+                {project.demo ? (
                   <a
                     href={project.demo}
                     target="_blank"
@@ -264,6 +265,14 @@ const ProjectDetail = () => {
                     <i className="fas fa-external-link-alt mr-2"></i>
                     {getText('viewDemo')}
                   </a>
+                ) : (
+                  <button
+                    onClick={() => alert('Demo non ancora disponibile per questo progetto. Controlla il repository GitHub per maggiori dettagli!')}
+                    className="inline-flex items-center px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-xl font-medium cursor-not-allowed"
+                  >
+                    <i className="fas fa-external-link-alt mr-2"></i>
+                    {getText('viewDemo')}
+                  </button>
                 )}
                 
                 {project.github && (
@@ -275,6 +284,18 @@ const ProjectDetail = () => {
                   >
                     <i className="fab fa-github mr-2"></i>
                     {getText('viewCode')}
+                  </a>
+                )}
+
+                {project.linkedin && (
+                  <a
+                    href={project.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 shadow-lg hover:scale-105"
+                  >
+                    <i className="fab fa-linkedin mr-2"></i>
+                    LinkedIn
                   </a>
                 )}
 

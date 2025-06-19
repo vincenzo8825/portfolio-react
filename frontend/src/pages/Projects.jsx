@@ -162,10 +162,10 @@ const Projects = () => {
     category: getProjectCategory(project.technologies),
     demo: project.demo_url,
     github: project.github_url,
-    linkedin: "https://linkedin.com/in/vincenzorocca", // Default value
+    linkedin: project.linkedin_url || "https://linkedin.com/in/vincenzorocca", // Default value
     year: project.project_date ? new Date(project.project_date).getFullYear() : new Date().getFullYear(),
     client: "Portfolio Project", // Default value
-    duration: "Variable", // Default value
+    // duration: "Variable", // Default value
     features: [], // Could be derived from long_description if needed
     image: project.image_url
   }))
@@ -340,7 +340,7 @@ const Projects = () => {
         }`}>
           <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4">
             <div className="flex gap-1 sm:gap-2">
-              {project.demo && (
+              {project.demo ? (
                 <a
                   href={project.demo}
                   target="_blank"
@@ -350,6 +350,14 @@ const Projects = () => {
                   <i className="fas fa-external-link-alt mr-1"></i>
                   <span className="hidden sm:inline">{getText('demo')}</span>
                 </a>
+              ) : (
+                <button
+                  onClick={() => alert('Demo non ancora disponibile per questo progetto. Controlla il repository GitHub per maggiori dettagli!')}
+                  className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-gray-500/20 backdrop-blur-sm text-white/70 rounded-xl hover:bg-gray-400/30 transition-colors duration-300 text-xs sm:text-sm cursor-not-allowed"
+                >
+                  <i className="fas fa-external-link-alt mr-1"></i>
+                  <span className="hidden sm:inline">{getText('demo')}</span>
+                </button>
               )}
               {project.github && (
                 <a
@@ -360,6 +368,17 @@ const Projects = () => {
                 >
                   <i className="fab fa-github mr-1"></i>
                   <span className="hidden sm:inline">{getText('code')}</span>
+                </a>
+              )}
+              {project.linkedin && (
+                <a
+                  href={project.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors duration-300 text-xs sm:text-sm"
+                >
+                  <i className="fab fa-linkedin mr-1"></i>
+                  <span className="hidden sm:inline">LinkedIn</span>
                 </a>
               )}
             </div>
@@ -432,7 +451,7 @@ const Projects = () => {
               {project.duration || 'Variable'}
             </span>
             <div className="flex gap-2">
-              {project.demo && (
+              {project.demo ? (
                 <a
                   href={project.demo}
                   target="_blank"
@@ -442,6 +461,14 @@ const Projects = () => {
                 >
                   <i className="fas fa-external-link-alt"></i>
                 </a>
+              ) : (
+                <button
+                  onClick={() => alert('Demo non ancora disponibile per questo progetto. Controlla il repository GitHub per maggiori dettagli!')}
+                  className="p-2 text-gray-300 hover:text-gray-400 transition-colors duration-300 cursor-not-allowed"
+                  title="Demo non disponibile"
+                >
+                  <i className="fas fa-external-link-alt"></i>
+                </button>
               )}
               {project.github && (
                 <a
@@ -452,6 +479,17 @@ const Projects = () => {
                   title={getText('viewCode')}
                 >
                   <i className="fab fa-github"></i>
+                </a>
+              )}
+              {project.linkedin && (
+                <a
+                  href={project.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300"
+                  title="LinkedIn"
+                >
+                  <i className="fab fa-linkedin"></i>
                 </a>
               )}
             </div>
@@ -606,24 +644,47 @@ const Projects = () => {
               </Link>
               
               <div className="flex gap-3">
-                <a
-                  href={project.demo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 font-medium border border-gray-200 dark:border-slate-600"
-                >
-                  <i className="fas fa-external-link-alt mr-2"></i>
-                  {getText('viewDemo')}
-                </a>
-                <a
-                  href={project.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 font-medium border border-gray-200 dark:border-slate-600"
-                >
-                  <i className="fab fa-github mr-2"></i>
-                  {getText('viewCode')}
-                </a>
+                {project.demo ? (
+                  <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 font-medium border border-gray-200 dark:border-slate-600"
+                  >
+                    <i className="fas fa-external-link-alt mr-2"></i>
+                    {getText('viewDemo')}
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => alert('Demo non ancora disponibile per questo progetto. Controlla il repository GitHub per maggiori dettagli!')}
+                    className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-xl cursor-not-allowed font-medium border border-gray-200 dark:border-gray-600"
+                  >
+                    <i className="fas fa-external-link-alt mr-2"></i>
+                    {getText('viewDemo')}
+                  </button>
+                )}
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 font-medium border border-gray-200 dark:border-slate-600"
+                  >
+                    <i className="fab fa-github mr-2"></i>
+                    {getText('viewCode')}
+                  </a>
+                )}
+                {project.linkedin && (
+                  <a
+                    href={project.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-300 shadow-lg hover:scale-105 font-medium border border-blue-200 dark:border-blue-800"
+                  >
+                    <i className="fab fa-linkedin mr-2"></i>
+                    LinkedIn
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -915,24 +976,47 @@ const Projects = () => {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <a
-              href={project.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium"
-            >
-              <i className="fas fa-external-link-alt mr-2"></i>
-              {getText('viewDemo')}
-            </a>
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-white dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium border border-gray-200 dark:border-slate-600/50"
-            >
-              <i className="fab fa-github mr-2"></i>
-              {getText('viewCode')}
-            </a>
+            {project.demo ? (
+              <a
+                href={project.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium"
+              >
+                <i className="fas fa-external-link-alt mr-2"></i>
+                {getText('viewDemo')}
+              </a>
+            ) : (
+              <button
+                onClick={() => alert('Demo non ancora disponibile per questo progetto. Controlla il repository GitHub per maggiori dettagli!')}
+                className="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-xl cursor-not-allowed text-sm font-medium"
+              >
+                <i className="fas fa-external-link-alt mr-2"></i>
+                {getText('viewDemo')}
+              </button>
+            )}
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-white dark:bg-slate-700/80 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium border border-gray-200 dark:border-slate-600/50"
+              >
+                <i className="fab fa-github mr-2"></i>
+                {getText('viewCode')}
+              </a>
+            )}
+            {project.linkedin && (
+              <a
+                href={project.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-300 shadow-lg hover:scale-105 text-sm font-medium border border-blue-200 dark:border-blue-800"
+              >
+                <i className="fab fa-linkedin mr-2"></i>
+                LinkedIn
+              </a>
+            )}
           </div>
         </div>
       </div>
