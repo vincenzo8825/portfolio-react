@@ -41,7 +41,9 @@ const TechStack = () => {
       { name: 'JavaScript', level: 85, icon: 'devicon-javascript-plain', description: 'ES6+, DOM, Async/Await, API' },
       { name: 'TypeScript', level: 80, icon: 'devicon-typescript-plain', description: 'Tipizzazione statica, Interfaces, Generics' },
       { name: 'React', level: 80, icon: 'devicon-react-original', description: 'Hooks, Context, Redux, Next.js' },
-      { name: 'Angular', level: 75, icon: 'devicon-angularjs-plain', description: 'Components, Services, RxJS, NgRx' },
+      { name: 'Angular', level: 80, icon: 'devicon-angularjs-plain', description: 'Components, Services, RxJS, NgRx' },
+      { name: 'SASS', level: 85, icon: 'devicon-sass-original', description: 'Variables, Mixins, Nesting, Functions' },
+      { name: 'Tailwind CSS', level: 90, icon: 'devicon-tailwindcss-plain', description: 'Utility-first, Responsive, Customization' },
       { name: 'Bootstrap', level: 90, icon: 'devicon-bootstrap-plain', description: 'Componenti, Grid, Personalizzazione' }
     ],
     backend: [
@@ -54,7 +56,9 @@ const TechStack = () => {
       { name: 'Git', level: 85, icon: 'devicon-git-plain', description: 'Version control, Branching, Merging' },
       { name: 'Docker', level: 70, icon: 'devicon-docker-plain', description: 'Containerization, Docker Compose' },
       { name: 'Webpack/Vite', level: 75, icon: 'devicon-webpack-plain', description: 'Module bundling, Hot reload' },
-      { name: 'VS Code', level: 95, icon: 'devicon-vscode-plain', description: 'Extensions, Debugging, IntelliSense' }
+      { name: 'VS Code', level: 95, icon: 'devicon-vscode-plain', description: 'Extensions, Debugging, IntelliSense' },
+      { name: 'Figma', level: 80, icon: 'devicon-figma-plain', description: 'UI/UX Design, Prototyping, Collaboration' },
+      { name: 'Canva', level: 75, icon: 'fas fa-palette', description: 'Graphic Design, Social Media, Branding' }
     ]
   }
 
@@ -208,32 +212,7 @@ const TechStack = () => {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center mt-16" data-aos="fade-up">
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Pronto per il tuo prossimo progetto?
-          </h3>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            Collaboriamo per trasformare le tue idee in realtà digitale. 
-            Contattami per discutere del tuo progetto.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/projects"
-              className="btn-secondary"
-            >
-              <i className="fas fa-eye mr-2"></i>
-              Visualizza i miei progetti
-            </a>
-            <a
-              href="/contact"
-              className="btn-primary"
-            >
-              <i className="fas fa-rocket mr-2"></i>
-              Iniziamo un progetto
-            </a>
-          </div>
-        </div>
+
       </div>
     </section>
   )

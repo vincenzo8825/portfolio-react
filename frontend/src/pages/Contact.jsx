@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useLanguage } from '../context/LanguageContext'
+import { contactService } from '../services/contact'
 
 const Contact = () => {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,7 +19,7 @@ const Contact = () => {
   const [focusedField, setFocusedField] = useState(null)
   const [typingAnimation, setTypingAnimation] = useState('')
 
-  const typingText = "Trasformiamo la tua idea in realtà digitale..."
+  const typingText = t('contactTyping')
   
   useEffect(() => {
     let index = 0
@@ -29,7 +32,7 @@ const Contact = () => {
     }, 100)
     
     return () => clearInterval(timer)
-  }, [])
+  }, [typingText])
 
   const handleChange = (e) => {
     setFormData({
@@ -42,9 +45,17 @@ const Contact = () => {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      // Send message via API
+      await contactService.sendMessage({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject || 'Contatto dal portfolio',
+        message: formData.message,
+        phone: formData.phone || null,
+        company: formData.company || null
+      })
+      
       setSubmitStatus('success')
       setFormData({
         name: '',
@@ -60,39 +71,49 @@ const Contact = () => {
       setTimeout(() => {
         setSubmitStatus(null)
       }, 5000)
-    }, 2000)
+    } catch (error) {
+      console.error('Error sending message:', error)
+      setSubmitStatus('error')
+      
+      // Reset error status after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(null)
+      }, 5000)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactMethods = [
     {
       icon: "fas fa-envelope",
-      title: "Email",
+      title: t('email'),
       value: "info@vincenzorocca.it",
-      description: "Rispondo entro 24 ore",
+      description: t('replyWithin24h'),
       color: "from-blue-500 to-cyan-500",
       action: "mailto:info@vincenzorocca.it"
     },
     {
       icon: "fas fa-phone",
-      title: "Telefono",
+      title: t('phone'),
       value: "+39 345 409 8887",
-      description: "Lun-Ven 9:00-18:00",
+      description: t('weekdaysSchedule'),
       color: "from-green-500 to-emerald-500",
       action: "tel:+393454098887"
     },
     {
       icon: "fab fa-whatsapp",
-      title: "WhatsApp",
-      value: "Chat Diretta",
-      description: "Messaggi e chiamate",
+      title: t('whatsapp'),
+      value: t('chatDirect'),
+      description: t('messagesAndCalls'),
       color: "from-green-400 to-green-600",
       action: "https://wa.me/393454098887"
     },
     {
       icon: "fas fa-map-marker-alt",
-      title: "Ubicazione",
-      value: "Italia",
-      description: "Disponibile da remoto",
+      title: t('location'),
+      value: t('italy'),
+      description: t('availableRemote'),
       color: "from-purple-500 to-pink-500",
       action: "#"
     }
@@ -133,15 +154,15 @@ const Contact = () => {
     },
     {
       question: "Quali tecnologie utilizzi?",
-      answer: "Principalmente React, Laravel, Vue.js, Node.js, MySQL, PostgreSQL e tecnologie cloud moderne."
+      answer: "Principalmente React, Angular, Laravel, Node.js, MySQL, PostgreSQL e tecnologie cloud moderne."
     },
     {
       question: "Offri supporto post-lancio?",
       answer: "Sì, offro pacchetti di manutenzione e supporto tecnico continuo per tutti i progetti."
     },
     {
-      question: "Lavori con clienti internazionali?",
-      answer: "Assolutamente sì, lavoro da remoto con clienti in tutta Europa e oltre."
+      question: "Quanto costa sviluppare un sito web?",
+      answer: "I costi variano in base alla complessità e alle funzionalità richieste. Offro sempre un preventivo gratuito personalizzato."
     }
   ]
 
@@ -162,23 +183,20 @@ const Contact = () => {
             {/* Badge */}
             <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-primary-500/10 to-accent-500/10 border border-primary-200/30 dark:border-primary-700/30 text-primary-700 dark:text-primary-300 text-sm font-medium mb-8 hover:scale-105 transition-transform duration-300">
               <i className="fas fa-handshake mr-3 text-lg"></i>
-              Collaboriamo Insieme
+{t('contactBadge')}
             </div>
 
             {/* Main Title */}
             <h1 className="text-5xl lg:text-7xl font-bold mb-8">
-              <span className="text-gray-900 dark:text-white">Iniziamo a </span>
               <span className="bg-gradient-to-r from-primary-600 via-accent-500 to-pink-500 bg-clip-text text-transparent">
-                Collaborare
+                {t('contactMainTitle')}
               </span>
             </h1>
 
             {/* Typing Animation */}
             <div className="max-w-4xl mx-auto text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-12">
               <p className="mb-4">
-                Hai un progetto innovativo in mente? Sono qui per trasformarlo in realtà digitale con 
-                <span className="font-semibold text-gray-900 dark:text-white"> tecnologie moderne</span> e 
-                <span className="text-accent-600 dark:text-accent-400 font-semibold"> design all'avanguardia</span>.
+                {t('contactDescription')}
               </p>
               <div className="text-2xl font-bold text-primary-600 dark:text-primary-400 min-h-[2rem]">
                 {typingAnimation}
@@ -231,7 +249,7 @@ const Contact = () => {
             <div className="relative">
               <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-slate-700/50">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                  Raccontami il Tuo Progetto
+                  {t('getInTouch')}
                 </h2>
 
                 {submitStatus === 'success' && (
@@ -241,6 +259,18 @@ const Contact = () => {
                       <div>
                         <p className="font-medium">Messaggio inviato con successo!</p>
                         <p className="text-sm opacity-80">Ti risponderò entro 24 ore.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-2xl text-red-800 dark:text-red-400">
+                    <div className="flex items-center">
+                      <i className="fas fa-exclamation-circle mr-3 text-xl"></i>
+                      <div>
+                        <p className="font-medium">Errore nell'invio del messaggio</p>
+                        <p className="text-sm opacity-80">Si è verificato un errore. Riprova più tardi o contattami direttamente.</p>
                       </div>
                     </div>
                   </div>

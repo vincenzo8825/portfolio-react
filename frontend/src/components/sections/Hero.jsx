@@ -9,12 +9,12 @@ const Hero = () => {
   const [isVisible, setIsVisible] = useState(false)
   
   const specializations = [
+    'Angular & React',
+    'JavaScript & TypeScript',
     'Laravel & PHP',
-    'React & JavaScript',
     'MySQL & Database Design',
-    'UI/UX Design',
-    'Node.js & Express',
-    'Docker & DevOps'
+    'SASS & Tailwind CSS',
+    'API Development & Integration'
   ]
 
   useEffect(() => {
@@ -127,9 +127,9 @@ const Hero = () => {
             {/* Premium Badge */}
             <div className="inline-flex items-center px-6 py-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 text-primary-700 dark:text-primary-300 text-sm font-semibold mb-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-              <i className="fas fa-code mr-2 group-hover:scale-110 transition-transform duration-300"></i>
+              <i className="fas fa-laptop-code mr-2 group-hover:scale-110 transition-transform duration-300 text-primary-600 dark:text-primary-400"></i>
               {t('heroBadge')}
-              <div className="ml-2 text-xs bg-primary-100 dark:bg-primary-900/50 px-2 py-1 rounded-lg">2024</div>
+              <div className="ml-2 text-xs bg-primary-100 dark:bg-primary-900/50 px-2 py-1 rounded-lg">2025</div>
             </div>
 
             {/* Enhanced Main Title */}
@@ -244,11 +244,11 @@ const Hero = () => {
                       Vincenzo Rocca
                     </h3>
                     <p className="text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold mb-2">
-                      Full Stack Developer
+                      {t('fullStackDeveloper')}
                     </p>
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                      Disponibile per nuovi progetti
+                                              {t('availableForProjects')}
                     </div>
                   </div>
                 </div>
@@ -313,13 +313,13 @@ const Hero = () => {
 
             {/* New: Skills radar chart visualization */}
             <div className="group relative p-8 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-slate-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
-              <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">Skills Overview</h4>
+              <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-6 text-center">{t('skillsOverview')}</h4>
               <div className="grid grid-cols-2 gap-6">
                 {[
                   { skill: 'Frontend', level: 90, color: 'blue' },
                   { skill: 'Backend', level: 85, color: 'green' },
                   { skill: 'Database', level: 80, color: 'purple' },
-                  { skill: 'DevOps', level: 70, color: 'orange' }
+                  { skill: 'UI/UX Design', level: 75, color: 'orange' }
                 ].map((item, index) => (
                   <div key={index} className="text-center">
                     <div className={`w-16 h-16 mx-auto mb-3 relative rounded-full bg-gradient-to-r from-${item.color}-500 to-${item.color}-600 flex items-center justify-center shadow-lg`}>
@@ -362,7 +362,7 @@ const Hero = () => {
             <i className="fas fa-chevron-down text-2xl text-gray-600 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"></i>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 font-medium">
-            {t('scrollToExplore') || 'Scorri per scendere'}
+            {t('scrollToExplore')}
           </p>
           
           {/* Glow effect on hover */}

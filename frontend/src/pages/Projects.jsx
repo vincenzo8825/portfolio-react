@@ -144,7 +144,7 @@ const Projects = () => {
   const getProjectCategory = (technologies) => {
     if (!technologies || technologies.length === 0) return 'other'
     
-    const frontendTechs = ['React', 'Vue.js', 'JavaScript', 'TypeScript', 'Tailwind CSS', 'Bootstrap']
+    const frontendTechs = ['React', 'Angular', 'JavaScript', 'TypeScript', 'Tailwind CSS', 'Bootstrap']
     const backendTechs = ['Laravel', 'PHP', 'Node.js', 'Python']
     
     const hasFrontend = technologies.some(tech => frontendTechs.includes(tech))
@@ -200,7 +200,7 @@ const Projects = () => {
     const colors = {
       'React': 'from-blue-400 to-blue-600',
       'Laravel': 'from-red-400 to-red-600',
-      'Vue.js': 'from-green-400 to-green-600',
+              'Angular': 'from-red-400 to-red-600',
       'Node.js': 'from-green-500 to-green-700',
       'MySQL': 'from-orange-400 to-orange-600',
       'PostgreSQL': 'from-blue-500 to-indigo-600',

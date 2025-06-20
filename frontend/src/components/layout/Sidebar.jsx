@@ -124,7 +124,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
               {user && (
                 <div className="flex items-center mt-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Online</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t('online')}</span>
                 </div>
               )}
             </div>
@@ -153,7 +153,14 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                     w-10 h-10 rounded-xl flex items-center justify-center mr-3 transition-all duration-300
                     ${isActive(item.path) 
                       ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg` 
-                      : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 group-hover:bg-gradient-to-r group-hover:' + item.gradient + ' group-hover:text-white'
+                      : `bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-400 
+                         group-hover:bg-gradient-to-r group-hover:${item.gradient} 
+                         ${item.path === '/' ? 'group-hover:from-blue-500 group-hover:to-blue-600' :
+                           item.path === '/about' ? 'group-hover:from-green-500 group-hover:to-green-600' :
+                           item.path === '/projects' ? 'group-hover:from-purple-500 group-hover:to-purple-600' :
+                           item.path === '/contact' ? 'group-hover:from-pink-500 group-hover:to-pink-600' :
+                           'group-hover:from-blue-500 group-hover:to-blue-600'} 
+                         group-hover:text-white`
                     }
                   `}>
                     <i className={`${item.icon} text-base`}></i>
@@ -189,7 +196,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center mr-3 text-white shadow-lg">
                     <i className="fas fa-tachometer-alt text-base"></i>
                   </div>
-                  <span className="flex-1">Dashboard Admin</span>
+                  <span className="flex-1">{t('dashboardAdmin')}</span>
                   <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
                 </Link>
 
@@ -201,7 +208,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mr-3 text-white shadow-lg">
                     <i className="fas fa-plus text-base"></i>
                   </div>
-                  <span className="flex-1">Nuovo Progetto</span>
+                  <span className="flex-1">{t('newProject')}</span>
                   <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
                 </Link>
 
@@ -213,7 +220,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mr-3 text-white shadow-lg">
                     <i className="fas fa-folder-open text-base"></i>
                   </div>
-                  <span className="flex-1">Gestisci Progetti</span>
+                  <span className="flex-1">{t('manageProjects')}</span>
                   <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
                 </Link>
               </div>
@@ -244,7 +251,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 flex items-center justify-center mr-3 text-white shadow-lg">
                   <i className="fas fa-sign-in-alt text-base"></i>
                 </div>
-                <span className="flex-1">Accesso Admin</span>
+                <span className="flex-1">{t('adminAccess')}</span>
                 <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
               </Link>
             </>
@@ -258,7 +265,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
             {/* Theme toggle con design premium */}
             <button
               onClick={toggleTheme}
-              className="group relative w-12 h-12 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              className="group relative w-12 h-12 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:from-yellow-100 hover:to-orange-100 dark:hover:from-yellow-900/30 dark:hover:to-orange-900/30 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
               title={isDark ? t('lightMode') : t('darkMode')}
             >
               <i className={`fas ${isDark ? 'fa-sun' : 'fa-moon'} text-lg transition-transform duration-300 group-hover:scale-110`}></i>
@@ -308,7 +315,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
           {/* Copyright con stile */}
           <div className="text-center mt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              © 2024 Vincenzo Rocca
+              © 2025 Vincenzo Rocca
             </p>
           </div>
         </div>
