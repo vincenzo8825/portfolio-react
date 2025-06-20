@@ -163,8 +163,8 @@ const About = () => {
             {/* Contact Cards Premium */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-16">
               {[
-                { icon: "fas fa-phone", label: t('phone'), value: "+39 345 409 8887", color: "from-green-500 to-emerald-500" },
-                { icon: "fas fa-envelope", label: t('email'), value: "info@vincenzorocca.it", color: "from-blue-500 to-cyan-500" },
+                                  { icon: "fas fa-phone", label: t('phone'), value: "3454098887", color: "from-green-500 to-emerald-500" },
+                { icon: "fas fa-envelope", label: t('email'), value: "vincenzorocca88@gmail.com", color: "from-blue-500 to-cyan-500" },
                 { icon: "fas fa-map-marker-alt", label: t('location'), value: t('italy'), color: "from-purple-500 to-pink-500" }
               ].map((contact, index) => (
                 <div key={index} className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl shadow-black/5 dark:shadow-black/20 border border-white/20 dark:border-slate-700/50 hover:scale-105 transition-all duration-500">

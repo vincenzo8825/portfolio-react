@@ -46,7 +46,7 @@ Password: root
 
 ### Credenziali Admin
 ```
-Email: vincenzo@admin.it
+Email: vincenzorocca88@gmail.com
 Password: admin123
 ```
 

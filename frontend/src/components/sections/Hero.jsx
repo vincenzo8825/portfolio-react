@@ -264,8 +264,8 @@ const Hero = () => {
                     <i className="fab fa-github text-xl mr-3 group-hover/btn:scale-110 transition-transform duration-300"></i>
                     <span className="font-semibold">GitHub</span>
                   </a>
-                  <a
-                    href="https://www.linkedin.com/in/webdevfullstack"
+                                    <a 
+                    href="https://www.linkedin.com/in/webdevfullstack/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group/btn flex items-center justify-center py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"

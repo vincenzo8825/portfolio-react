@@ -33,17 +33,17 @@ const Footer = () => {
               >
                 <i className="fab fa-github text-xl"></i>
               </a>
-              <a
-                href="https://www.linkedin.com/in/webdevfullstack"
-                target="_blank"
+                          <a
+              href="https://www.linkedin.com/in/webdevfullstack/"
+              target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
                 title="LinkedIn"
               >
                 <i className="fab fa-linkedin text-xl"></i>
               </a>
-              <a
-                href="mailto:info@vincenzorocca.it"
+                          <a
+              href="mailto:vincenzorocca88@gmail.com"
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
                 title="Email"
               >

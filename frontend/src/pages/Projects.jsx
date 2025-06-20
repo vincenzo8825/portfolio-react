@@ -162,7 +162,7 @@ const Projects = () => {
     category: getProjectCategory(project.technologies),
     demo: project.demo_url,
     github: project.github_url,
-    linkedin: project.linkedin_url || "https://linkedin.com/in/vincenzorocca", // Default value
+            linkedin: project.linkedin_url || "https://www.linkedin.com/in/webdevfullstack/", // Default value
     year: project.project_date ? new Date(project.project_date).getFullYear() : new Date().getFullYear(),
     client: "Portfolio Project", // Default value
     // duration: "Variable", // Default value

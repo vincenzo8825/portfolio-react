@@ -88,18 +88,18 @@ const Contact = () => {
     {
       icon: "fas fa-envelope",
       title: t('email'),
-      value: "info@vincenzorocca.it",
+      value: "vincenzorocca88@gmail.com",
       description: t('replyWithin24h'),
       color: "from-blue-500 to-cyan-500",
-      action: "mailto:info@vincenzorocca.it"
+      action: "mailto:vincenzorocca88@gmail.com"
     },
     {
       icon: "fas fa-phone",
       title: t('phone'),
-      value: "+39 345 409 8887",
+      value: "3454098887",
       description: t('weekdaysSchedule'),
       color: "from-green-500 to-emerald-500",
-      action: "tel:+393454098887"
+      action: "tel:3454098887"
     },
     {
       icon: "fab fa-whatsapp",
@@ -107,7 +107,7 @@ const Contact = () => {
       value: t('chatDirect'),
       description: t('messagesAndCalls'),
       color: "from-green-400 to-green-600",
-      action: "https://wa.me/393454098887"
+      action: "https://wa.me/3454098887"
     },
     {
       icon: "fas fa-map-marker-alt",

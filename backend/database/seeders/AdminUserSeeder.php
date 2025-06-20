@@ -20,14 +20,14 @@ class AdminUserSeeder extends Seeder
         if (!$adminExists) {
             User::create([
                 'name' => 'Vincenzo Rocca',
-                'email' => env('ADMIN_EMAIL', 'vincenzo@admin.it'),
+                'email' => env('ADMIN_EMAIL', 'vincenzorocca88@gmail.com'),
                 'password' => Hash::make('admin123'), // Password di default - CAMBIALA!
                 'is_admin' => true,
                 'email_verified_at' => now(),
             ]);
 
             $this->command->info('✅ Utente admin creato con successo!');
-            $this->command->info('📧 Email: ' . env('ADMIN_EMAIL', 'vincenzo@admin.it'));
+            $this->command->info('📧 Email: ' . env('ADMIN_EMAIL', 'vincenzorocca88@gmail.com'));
             $this->command->info('🔑 Password: admin123');
             $this->command->warn('⚠️  IMPORTANTE: Cambia la password dopo il primo login!');
         } else {

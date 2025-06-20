@@ -294,17 +294,17 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
             >
               <i className="fab fa-github text-base group-hover:scale-110 transition-transform duration-300"></i>
             </a>
-            <a
-              href="https://www.linkedin.com/in/webdevfullstack"
-              target="_blank"
+                          <a
+                href="https://www.linkedin.com/in/webdevfullstack/"
+                target="_blank"
               rel="noopener noreferrer"
               className="group w-10 h-10 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 flex items-center justify-center text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110"
               title="LinkedIn"
             >
               <i className="fab fa-linkedin text-base group-hover:scale-110 transition-transform duration-300"></i>
             </a>
-            <a
-              href="mailto:info@vincenzorocca.it"
+                          <a
+                href="mailto:vincenzorocca88@gmail.com"
               className="group w-10 h-10 rounded-xl bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 flex items-center justify-center text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110"
               title="Email"
             >

@@ -40,13 +40,13 @@ export const APP_CONFIG = {
   NAME: 'Vincenzo Rocca Portfolio',
   VERSION: '1.0.0',
   AUTHOR: 'Vincenzo Rocca',
-  EMAIL: 'vincenzo@admin.it',
+  EMAIL: 'vincenzorocca88@gmail.com',
 }
 
 // Admin Configuration
 export const ADMIN_CONFIG = {
   DEFAULT_CREDENTIALS: {
-    EMAIL: 'vincenzo@admin.it',
+    EMAIL: 'vincenzorocca88@gmail.com',
     PASSWORD: 'admin123', // Per demo - da cambiare in produzione
   },
   DASHBOARD_ROUTES: {
@@ -68,10 +68,10 @@ export const UI_CONFIG = {
 
 // Social Links
 export const SOCIAL_LINKS = {
-  GITHUB: 'https://github.com/vincenzorocca',
-  LINKEDIN: 'https://linkedin.com/in/vincenzorocca',
+  GITHUB: 'https://github.com/vincenzo8825',
+  LINKEDIN: 'https://www.linkedin.com/in/webdevfullstack/',
   TWITTER: 'https://twitter.com/vincenzorocca',
-  EMAIL: 'mailto:vincenzo@vincenzorocca.dev',
+  EMAIL: 'mailto:vincenzorocca88@gmail.com',
 }
 
 // SEO Configuration
@@ -92,12 +92,12 @@ export const APP_VERSION = '1.0.0'
 export const CONTACT_INFO = {
   name: 'Vincenzo Rocca',
   email: 'vincenzorocca88@gmail.com',
-  phone: '+39 345 409 8887',
+  phone: '3454098887',
   location: 'Italia',
   socialMedia: {
     github: 'https://github.com/vincenzo8825',
-    linkedin: 'https://www.linkedin.com/in/webdevfullstack',
-    email: 'mailto:info@vincenzorocca.it'
+    linkedin: 'https://www.linkedin.com/in/webdevfullstack/',
+    email: 'mailto:vincenzorocca88@gmail.com'
   }
 }
 
