@@ -17,20 +17,34 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => [
         'http://localhost:3000',
         'http://localhost:5173',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5173',
-        // Aggiungi qui il dominio di produzione quando sarà disponibile
-        // 'https://tuodominio.com'
+        // Produzione - Hostinger domains
+        'https://*.hostinger.com',
+        'https://*.000webhostapp.com',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://[a-z0-9\-]+\.hostinger\.com$#',
+        '#^https://[a-z0-9\-]+\.000webhostapp\.com$#',
+    ],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers',
+        'X-CSRF-TOKEN',
+        'X-XSRF-TOKEN'
+    ],
 
     'exposed_headers' => [],
 

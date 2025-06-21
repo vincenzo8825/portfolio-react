@@ -573,7 +573,7 @@ const ProjectDetail = () => {
                 </h3>
                 
                 <div className="flex flex-wrap gap-2">
-                  {project.tech.map((tech, index) => (
+                  {project.technologies && project.technologies.map((tech, index) => (
                     <span
                       key={index}
                       className="px-3 py-1 bg-gradient-to-r from-primary-500/10 to-accent-500/10 text-primary-700 dark:text-primary-300 text-sm rounded-full border border-primary-200/30 dark:border-primary-700/30"

@@ -25,7 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Rotte di autenticazione (pubbliche)
 Route::prefix('v1/auth')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1'); // Max 5 tentativi per minuto
 
     // Rotte protette per admin autenticati
     Route::middleware('auth:sanctum')->group(function () {
@@ -50,8 +51,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/technologies/by-category', [TechnologyController::class, 'byCategory']);
     Route::get('/technologies/{id}', [TechnologyController::class, 'show']);
 
-    // Contatti - solo creazione pubblica
-    Route::post('/contacts', [ContactController::class, 'store']);
+    // Contatti - solo creazione pubblica con rate limiting
+    Route::post('/contacts', [ContactController::class, 'store'])
+        ->middleware('throttle:3,60'); // Max 3 messaggi per ora
 });
 
 // Rotte protette (solo admin con autenticazione)
@@ -82,10 +84,4 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'admin'])->group(function
     Route::delete('/upload/file', [FileUploadController::class, 'deleteFile']);
 });
 
-// Rotta per gestione CORS preflight
-Route::options('{any}', function () {
-    return response('', 200)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-})->where('any', '.*');
+// CORS preflight gestito automaticamente da Laravel

@@ -51,14 +51,34 @@ export const authService = {
     return localStorage.getItem('auth-token')
   },
 
-  // Set auth token
+  // Set auth token with expiration
   setToken(token) {
+    const tokenData = {
+      token: token,
+      timestamp: Date.now(),
+      expires: Date.now() + (24 * 60 * 60 * 1000) // 24 ore
+    }
     localStorage.setItem('auth-token', token)
+    localStorage.setItem('auth-token-data', JSON.stringify(tokenData))
   },
 
   // Remove auth token
   removeToken() {
     localStorage.removeItem('auth-token')
+    localStorage.removeItem('auth-token-data')
+  },
+
+  // Check if token is expired
+  isTokenExpired() {
+    const tokenData = localStorage.getItem('auth-token-data')
+    if (!tokenData) return true
+    
+    try {
+      const data = JSON.parse(tokenData)
+      return Date.now() > data.expires
+    } catch {
+      return true
+    }
   },
 
   // Change password

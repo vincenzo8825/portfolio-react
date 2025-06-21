@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Registra il middleware admin
+        // Security headers globali
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
+        // Registra middleware aliases
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);

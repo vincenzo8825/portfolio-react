@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -25,6 +26,13 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Log tentativo di accesso fallito
+            Log::warning('Failed login attempt', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
             throw ValidationException::withMessages([
                 'email' => ['Le credenziali fornite non sono corrette.'],
             ]);
@@ -32,6 +40,13 @@ class AuthController extends Controller
 
         // Verifica che l'utente sia admin
         if (!$user->is_admin) {
+            // Log tentativo accesso non autorizzato
+            Log::warning('Non-admin user attempted admin login', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => $request->ip()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Accesso negato. Solo gli amministratori possono accedere.'
@@ -43,6 +58,14 @@ class AuthController extends Controller
 
         // Crea nuovo token
         $token = $user->createToken('admin-token', ['admin'])->plainTextToken;
+
+        // Log accesso riuscito
+        Log::info('Successful admin login', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent()
+        ]);
 
         return response()->json([
             'success' => true,

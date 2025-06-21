@@ -43,14 +43,22 @@ class ContactController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'subject' => 'nullable|string|max:255',
-            'message' => 'required|string|max:5000',
-            'budget' => 'nullable|string|max:100',
-            'timeline' => 'nullable|string|max:100',
-            'projectType' => 'nullable|string|max:100'
+            'name' => 'required|string|max:255|regex:/^[a-zA-Z\s\p{L}]+$/u',
+            'email' => 'required|email:rfc,dns|max:255',
+            'subject' => 'nullable|string|max:255|regex:/^[a-zA-Z0-9\s\p{L}\.\-_!?]+$/u',
+            'message' => 'required|string|max:5000|min:10',
+            'budget' => 'nullable|string|max:100|in:under-1k,1k-5k,5k-10k,10k-plus',
+            'timeline' => 'nullable|string|max:100|in:asap,1-month,2-3-months,flexible',
+            'projectType' => 'nullable|string|max:100|in:website,webapp,ecommerce,mobile,other'
         ]);
+
+        // Sanitizzazione avanzata
+        $validated['name'] = strip_tags(trim($validated['name']));
+        $validated['subject'] = strip_tags(trim($validated['subject'] ?? ''));
+        $validated['message'] = strip_tags(trim($validated['message']));
+
+        // Prevenzione email injection
+        $validated['email'] = filter_var($validated['email'], FILTER_SANITIZE_EMAIL);
 
         // Aggiungi informazioni sulla richiesta
         $validated['ip_address'] = $request->ip();

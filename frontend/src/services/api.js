@@ -17,6 +17,25 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth-token')
     if (token) {
+      // Verifica scadenza token prima di ogni richiesta
+      const tokenData = localStorage.getItem('auth-token-data')
+      if (tokenData) {
+        try {
+          const data = JSON.parse(tokenData)
+          if (Date.now() > data.expires) {
+            // Token scaduto
+            localStorage.removeItem('auth-token')
+            localStorage.removeItem('auth-token-data')
+            window.location.href = '/login'
+            return Promise.reject(new Error('Token expired'))
+          }
+        } catch {
+          // Dati token corrotti
+          localStorage.removeItem('auth-token')
+          localStorage.removeItem('auth-token-data')
+        }
+      }
+      
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
