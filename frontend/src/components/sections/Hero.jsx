@@ -8,17 +8,66 @@ const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   
+  // Contatori animati per le statistiche
+  const [projectsCount, setProjectsCount] = useState(0)
+  const [bootcampsCount, setBootcampsCount] = useState(0)
+  const [techCount, setTechCount] = useState(0)
+  const [showCounters, setShowCounters] = useState(false)
+  
   const specializations = [
     'Angular & React',
     'JavaScript & TypeScript',
     'Laravel & PHP',
-    'MySQL & Database Design',
+    'MySQL & Database',
     'SASS & Tailwind CSS',
-    'API Development & Integration'
+    
   ]
 
   useEffect(() => {
     setIsVisible(true)
+    
+    // Animazione contatori che parte all'apertura del sito
+    const startCounters = () => {
+      // Mostra i contatori quando inizia l'animazione
+      setShowCounters(true)
+      
+      // Animazione progetti (target: 10)
+      let projectsCurrent = 0
+      const projectsTimer = setInterval(() => {
+        projectsCurrent += 1
+        setProjectsCount(projectsCurrent)
+        if (projectsCurrent >= 10) {
+          clearInterval(projectsTimer)
+        }
+      }, 150)
+
+      // Animazione bootcamps (target: 3) - parte dopo 500ms
+      setTimeout(() => {
+        let bootcampsCurrent = 0
+        const bootcampsTimer = setInterval(() => {
+          bootcampsCurrent += 1
+          setBootcampsCount(bootcampsCurrent)
+          if (bootcampsCurrent >= 3) {
+            clearInterval(bootcampsTimer)
+          }
+        }, 400)
+      }, 500)
+
+      // Animazione tecnologie (target: 12) - parte dopo 1000ms
+      setTimeout(() => {
+        let techCurrent = 0
+        const techTimer = setInterval(() => {
+          techCurrent += 1
+          setTechCount(techCurrent)
+          if (techCurrent >= 12) {
+            clearInterval(techTimer)
+          }
+        }, 120)
+      }, 1000)
+    }
+
+    // Inizia l'animazione dopo 2 secondi dall'apertura del sito
+    setTimeout(startCounters, 2000)
   }, [])
 
   // Typing animation effect
@@ -127,7 +176,10 @@ const Hero = () => {
             {/* Premium Badge */}
             <div className="inline-flex items-center px-6 py-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 text-primary-700 dark:text-primary-300 text-sm font-semibold mb-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-              <i className="fas fa-laptop-code mr-2 group-hover:scale-110 transition-transform duration-300 text-primary-600 dark:text-primary-400"></i>
+              <span className="mr-2" style={{ color: '#1e40af !important', display: 'inline-block' }}>
+                <i className="fas fa-code group-hover:scale-110 transition-transform duration-300" style={{ color: 'inherit !important' }}></i>
+              </span>
+              {/* Icona BLU FORZATA */}
               {t('heroBadge')}
               <div className="ml-2 text-xs bg-primary-100 dark:bg-primary-900/50 px-2 py-1 rounded-lg">2025</div>
             </div>
@@ -191,21 +243,21 @@ const Hero = () => {
               </Link>
             </div>
 
-            {/* Enhanced Stats Cards */}
+            {/* Enhanced Stats Cards con Animazione */}
             <div className="grid grid-cols-3 gap-4" style={{ animationDelay: '1.2s' }}>
               {[
-                { number: '10+', label: t('projectsCount').split(' ')[1], color: 'blue', icon: 'fas fa-project-diagram' },
-                { number: '3+', label: t('bootcampsCount').split(' ')[1], color: 'purple', icon: 'fas fa-graduation-cap' },
-                { number: '12+', label: t('technologiesCount').split(' ')[1], color: 'pink', icon: 'fas fa-code' }
+                { count: projectsCount, target: 10, label: 'Progetti', icon: 'fas fa-project-diagram', colors: { bg: 'from-blue-500 to-blue-600', text: 'from-blue-600 to-blue-700' } },
+                { count: bootcampsCount, target: 3, label: 'Bootcamp', icon: 'fas fa-graduation-cap', colors: { bg: 'from-purple-500 to-purple-600', text: 'from-purple-600 to-purple-700' } },
+                { count: techCount, target: 12, label: 'Tecnologie', icon: 'fas fa-code', colors: { bg: 'from-pink-500 to-pink-600', text: 'from-pink-600 to-pink-700' } }
               ].map((stat, index) => (
-                <div key={index} className={`group text-center p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/30 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer`}>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 flex items-center justify-center text-white mb-3 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                    <i className={`${stat.icon} text-lg`}></i>
+                <div key={index} className="group text-center p-6 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-2xl border border-white/30 dark:border-slate-700/40 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${stat.colors.bg} flex items-center justify-center text-white mb-4 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                    <i className={`${stat.icon} text-xl`}></i>
                   </div>
-                  <div className={`text-3xl font-black bg-gradient-to-r from-${stat.color}-600 to-${stat.color}-700 bg-clip-text text-transparent mb-2`}>
-                    {stat.number}
+                  <div className={`text-3xl font-black bg-gradient-to-r ${stat.colors.text} bg-clip-text text-transparent mb-2 transition-opacity duration-300 ${showCounters ? 'opacity-100' : 'opacity-0'}`}>
+                    {showCounters ? `${stat.count}+` : '0+'}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 font-semibold">
                     {stat.label}
                   </div>
                 </div>

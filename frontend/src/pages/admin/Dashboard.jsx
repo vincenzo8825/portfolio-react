@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { projectsService } from '../../services/projects'
-import { contactService } from '../../services/contact'
 import { useLanguage } from '../../context/LanguageContext'
 
 const Dashboard = () => {
@@ -9,14 +8,22 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     totalProjects: 0,
     featuredProjects: 0,
-    completedProjects: 0,
-    totalMessages: 0
+    completedProjects: 0
   })
   const [recentProjects, setRecentProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadDashboardData()
+    
+    // Aggiorna i dati ogni 30 secondi
+    const interval = setInterval(() => {
+      loadDashboardData()
+    }, 30000)
+    
+    return () => {
+      clearInterval(interval)
+    }
   }, [])
 
   const loadDashboardData = async () => {
@@ -36,8 +43,11 @@ const Dashboard = () => {
       setStats({
         totalProjects: projects.length,
         featuredProjects: featuredCount,
-        completedProjects: completedCount,
-        totalMessages: 0 // Placeholder per ora
+        completedProjects: completedCount
+      })
+      
+      console.log('Dashboard stats updated:', {
+        totalProjects: projects.length
       })
       
       setRecentProjects(sortedProjects)
@@ -54,17 +64,26 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t('dashboard')}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {t('welcome')} nel pannello di controllo del portfolio
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              {t('dashboard')}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              {t('welcome')} nel pannello di controllo del portfolio
+            </p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200 flex items-center"
+          >
+            <i className="fas fa-sync-alt mr-2"></i>
+            Aggiorna
+          </button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-white dark:bg-dark-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-dark-600">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
@@ -107,19 +126,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-dark-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-dark-600">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-orange-100 dark:bg-orange-900/30">
-                <i className="fas fa-envelope text-orange-600 dark:text-orange-400 text-xl"></i>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Messaggi Ricevuti</p>
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {loading ? '-' : stats.totalMessages}
-                </p>
-              </div>
-            </div>
-          </div>
+
         </div>
 
         {/* Quick Actions */}

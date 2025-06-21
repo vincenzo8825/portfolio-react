@@ -24,6 +24,11 @@ export const contactService = {
     }
   },
 
+  // Alias for getContacts (for consistency)
+  async getAll(params = {}) {
+    return this.getContacts(params)
+  },
+
   // Get contact statistics (admin only)
   async getContactStats() {
     const response = await apiService.get(API_ENDPOINTS.ADMIN.CONTACTS_STATS)

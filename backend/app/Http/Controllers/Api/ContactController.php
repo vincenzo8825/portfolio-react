@@ -47,13 +47,20 @@ class ContactController extends Controller
             'email' => 'required|email|max:255',
             'subject' => 'nullable|string|max:255',
             'message' => 'required|string|max:5000',
-            'phone' => 'nullable|string|max:20',
-            'company' => 'nullable|string|max:255'
+            'budget' => 'nullable|string|max:100',
+            'timeline' => 'nullable|string|max:100',
+            'projectType' => 'nullable|string|max:100'
         ]);
 
         // Aggiungi informazioni sulla richiesta
         $validated['ip_address'] = $request->ip();
         $validated['user_agent'] = $request->userAgent();
+
+        // Mappa projectType a project_type per il database
+        if (isset($validated['projectType'])) {
+            $validated['project_type'] = $validated['projectType'];
+            unset($validated['projectType']);
+        }
 
         try {
             $contact = Contact::create($validated);

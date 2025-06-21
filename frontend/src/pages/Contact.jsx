@@ -52,11 +52,13 @@ const Contact = () => {
         email: formData.email,
         subject: formData.subject || 'Contatto dal portfolio',
         message: formData.message,
-        phone: formData.phone || null,
-        company: formData.company || null
+        budget: formData.budget || null,
+        timeline: formData.timeline || null,
+        projectType: formData.projectType || null
       })
       
       setSubmitStatus('success')
+      
       setFormData({
         name: '',
         email: '',

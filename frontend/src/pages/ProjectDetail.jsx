@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { projectsService } from '../services/projects'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
+import useDocumentTitle from '../hooks/useDocumentTitle'
 import { useNotification } from '../context/NotificationContext'
 
 const ProjectDetail = () => {
@@ -14,6 +15,9 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
+
+  // Dynamic title
+  useDocumentTitle(project ? `${project.title}` : 'Progetto', [project?.title])
 
   const translations = {
     it: {

@@ -10,6 +10,8 @@ const TechStack = () => {
     triggerOnce: true
   })
 
+
+
   const tabs = [
     {
       id: 'frontend',
@@ -167,50 +169,7 @@ const TechStack = () => {
           ))}
         </div>
 
-        {/* Achievements Section */}
-        <div className="bg-white dark:bg-dark-700 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-dark-600" data-aos="fade-up">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-4">
-                <i className="fas fa-trophy text-2xl text-white"></i>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Progetti Completati
-              </h4>
-              <p className="text-3xl font-bold text-green-600 mb-2">10+</p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Applicazioni web moderne e performanti
-              </p>
-            </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-4">
-                <i className="fas fa-graduation-cap text-2xl text-white"></i>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Bootcamp Completati
-              </h4>
-              <p className="text-3xl font-bold text-blue-600 mb-2">3+</p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Formazione intensiva e specializzata
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mb-4">
-                <i className="fas fa-code text-2xl text-white"></i>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Tecnologie Padroneggiate
-              </h4>
-              <p className="text-3xl font-bold text-purple-600 mb-2">12+</p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Linguaggi e framework moderni
-              </p>
-            </div>
-          </div>
-        </div>
 
 
       </div>

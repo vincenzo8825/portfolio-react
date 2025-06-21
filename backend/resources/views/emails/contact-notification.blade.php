@@ -258,12 +258,12 @@
 </head>
 <body>
     <div class="email-container">
-        <div class="header">
+    <div class="header">
             <h1>🚀 Nuovo Lead Portfolio!</h1>
             <p>Qualcuno è interessato ai tuoi servizi</p>
-        </div>
+    </div>
 
-        <div class="content">
+    <div class="content">
             <div class="lead-alert">
                 ✨ Hai ricevuto un nuovo messaggio di interesse!
             </div>
@@ -275,7 +275,7 @@
                         <div class="contact-label">Nome Completo</div>
                         <div class="contact-value">{{ $contact->name }}</div>
                     </div>
-                </div>
+        </div>
 
                 <div class="contact-row">
                     <div class="contact-icon">📧</div>
@@ -283,37 +283,47 @@
                         <div class="contact-label">Email di Contatto</div>
                         <div class="contact-value">{{ $contact->email }}</div>
                     </div>
-                </div>
+        </div>
 
-                @if($contact->phone)
-                <div class="contact-row">
-                    <div class="contact-icon">📱</div>
-                    <div class="contact-info">
-                        <div class="contact-label">Telefono</div>
-                        <div class="contact-value">{{ $contact->phone }}</div>
-                    </div>
-                </div>
-                @endif
-
-                @if($contact->company)
-                <div class="contact-row">
-                    <div class="contact-icon">🏢</div>
-                    <div class="contact-info">
-                        <div class="contact-label">Azienda</div>
-                        <div class="contact-value">{{ $contact->company }}</div>
-                    </div>
-                </div>
-                @endif
-
-                @if($contact->subject)
+        @if($contact->subject)
                 <div class="contact-row">
                     <div class="contact-icon">🎯</div>
                     <div class="contact-info">
                         <div class="contact-label">Oggetto</div>
                         <div class="contact-value">{{ $contact->subject }}</div>
                     </div>
-                </div>
-                @endif
+        </div>
+        @endif
+
+        @if($contact->project_type)
+                <div class="contact-row">
+                    <div class="contact-icon">🚀</div>
+                    <div class="contact-info">
+                        <div class="contact-label">Tipo di Progetto</div>
+                        <div class="contact-value">{{ $contact->project_type }}</div>
+                    </div>
+        </div>
+        @endif
+
+        @if($contact->budget)
+                <div class="contact-row">
+                    <div class="contact-icon">💰</div>
+                    <div class="contact-info">
+                        <div class="contact-label">Budget</div>
+                        <div class="contact-value">{{ $contact->budget }}</div>
+                    </div>
+        </div>
+        @endif
+
+        @if($contact->timeline)
+                <div class="contact-row">
+                    <div class="contact-icon">⏱️</div>
+                    <div class="contact-info">
+                        <div class="contact-label">Timeline</div>
+                        <div class="contact-value">{{ $contact->timeline }}</div>
+                    </div>
+        </div>
+        @endif
             </div>
 
             <div class="message-section">
@@ -321,28 +331,34 @@
                 <div class="message-text">
                     "{{ $contact->message }}"
                 </div>
-            </div>
+        </div>
 
             <div class="action-buttons">
                 <a href="mailto:{{ $contact->email }}?subject=Re: {{ $contact->subject }}" class="btn btn-primary">
                     📩 Rispondi Subito
                 </a>
-                <a href="tel:{{ $contact->phone ?? '' }}" class="btn btn-secondary">
-                    📞 Chiama Ora
+                @if($contact->project_type)
+                <a href="mailto:{{ $contact->email }}?subject=Preventivo {{ $contact->project_type }}" class="btn btn-secondary">
+                    💰 Invia Preventivo
                 </a>
-            </div>
+                @else
+                <a href="mailto:{{ $contact->email }}?subject=Informazioni sui nostri servizi" class="btn btn-secondary">
+                    📋 Invia Info
+                </a>
+                @endif
+        </div>
 
             <div class="metadata">
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                     <span><strong>📅 Ricevuto:</strong> {{ $contact->created_at->format('d/m/Y H:i') }}</span>
-                    @if($contact->ip_address)
+        @if($contact->ip_address)
                     <span><strong>🌍 IP:</strong> {{ $contact->ip_address }}</span>
-                    @endif
+        @endif
                 </div>
             </div>
-        </div>
+    </div>
 
-        <div class="footer">
+    <div class="footer">
             <div class="footer-brand">Vincenzo Rocca Portfolio</div>
             <div class="timestamp">Notifica automatica • {{ now()->format('d/m/Y H:i:s') }}</div>
         </div>
