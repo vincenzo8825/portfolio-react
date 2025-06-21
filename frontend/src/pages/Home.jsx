@@ -293,40 +293,7 @@ const Home = () => {
       {/* Tech Stack Section */}
       <TechStack />
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 via-accent-500 to-pink-500 relative overflow-hidden">
-        {/* Animated background patterns */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full opacity-20"></div>
-        </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-            {t('projectInMind')}
-          </h2>
-          <p className="text-xl text-white/90 mb-8 leading-relaxed">
-            {t('projectInMindDesc')}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/contact"
-              className="group inline-flex items-center px-8 py-4 bg-white text-primary-600 rounded-2xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-2xl shadow-black/20 hover:scale-105"
-            >
-              {t('startNow')}
-              <i className="fas fa-rocket ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
-            </Link>
-            
-            <Link
-              to="/projects"
-              className="group inline-flex items-center px-8 py-4 bg-white/10 text-white border-2 border-white/30 rounded-2xl font-bold hover:bg-white/20 transition-all duration-300 backdrop-blur-sm hover:scale-105"
-            >
-              {t('viewPortfolio')}
-              <i className="fas fa-eye ml-3 group-hover:translate-x-1 transition-transform duration-300"></i>
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

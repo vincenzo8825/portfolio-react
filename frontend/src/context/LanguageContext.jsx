@@ -165,7 +165,23 @@ const translations = {
     projectInMind: 'Hai un Progetto in Mente?',
     projectInMindDesc: 'Sono un junior developer in cerca di opportunità lavorative, ma sono anche aperto a collaborazioni freelance. Trasformiamo le tue idee in soluzioni digitali innovative. Contattami per una consulenza gratuita!',
     startNow: 'Iniziamo Subito',
-    viewPortfolio: 'Vedi Portfolio'
+    viewPortfolio: 'Vedi Portfolio',
+    
+    // TechStack Stats
+    techStack: 'Stack Tecnologico',
+    stackStats: 'Statistiche Stack',
+    stackNumbers: 'I Numeri del Mio Stack',
+    stackOverview: 'Una panoramica delle competenze e tecnologie che padroneggio',
+    mainAreas: 'Aree Principali',
+    averageSkill: 'Competenza Media',
+    continuousGrowth: 'Crescita Continua',
+    completeModernStack: 'Stack completo e moderno',
+    threeCategoriesDesc: 'Frontend, Backend, Tools',
+    highMastery: 'Alto livello di padronanza',
+    alwaysLearning: 'Sempre pronto a imparare',
+    frontendTech: 'Frontend Tech',
+    backendTech: 'Backend Tech',
+    yearsOfStudy: 'Anni di Studio'
   },
   en: {
     // Navigation  
@@ -326,7 +342,23 @@ const translations = {
     projectInMind: 'Have a Project in Mind?',
     projectInMindDesc: 'I\'m a junior developer looking for job opportunities, but I\'m also open to freelance collaborations. Let\'s transform your ideas into innovative digital solutions. Contact me for a free consultation!',
     startNow: 'Start Now',
-    viewPortfolio: 'View Portfolio'
+    viewPortfolio: 'View Portfolio',
+    
+    // TechStack Stats
+    techStack: 'Tech Stack',
+    stackStats: 'Stack Statistics',
+    stackNumbers: 'My Stack Numbers',
+    stackOverview: 'An overview of the skills and technologies I master',
+    mainAreas: 'Main Areas',
+    averageSkill: 'Average Skill',
+    continuousGrowth: 'Continuous Growth',
+    completeModernStack: 'Complete and modern stack',
+    threeCategoriesDesc: 'Frontend, Backend, Tools',
+    highMastery: 'High level of mastery',
+    alwaysLearning: 'Always ready to learn',
+    frontendTech: 'Frontend Tech',
+    backendTech: 'Backend Tech',
+    yearsOfStudy: 'Years of Study'
   }
 }
 
