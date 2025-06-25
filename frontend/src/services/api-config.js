@@ -1,4 +1,5 @@
 // API configuration per Laravel backend su Hostinger
+// TEMPORANEO: Test diretto Hostinger (trova IP reale)
 const API_BASE_URL = 'https://vincenzorocca.com/api/v1'
 
 // Helper per le chiamate API Laravel
