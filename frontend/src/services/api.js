@@ -26,18 +26,27 @@ api.interceptors.request.use(
             // Token scaduto
             localStorage.removeItem('auth-token')
             localStorage.removeItem('auth-token-data')
+            localStorage.removeItem('user-data')
             window.location.href = '/login'
             return Promise.reject(new Error('Token expired'))
           }
-        } catch {
-          // Dati token corrotti
+        } catch (error) {
+          // Dati token corrotti - pulisci tutto
+          console.error('Corrupted token data:', error)
           localStorage.removeItem('auth-token')
-          localStorage.removeItem('auth-token-data')
+          localStorage.removeItem('auth-token-data') 
+          localStorage.removeItem('user-data')
         }
       }
       
-      config.headers.Authorization = `Bearer ${token}`
+      // Sanitizza il token prima dell'uso
+      const sanitizedToken = token.replace(/[^a-zA-Z0-9\-_.]/g, '')
+      config.headers.Authorization = `Bearer ${sanitizedToken}`
     }
+    
+    // Aggiungi header di sicurezza
+    config.headers['X-Requested-With'] = 'XMLHttpRequest'
+    
     return config
   },
   (error) => {
@@ -54,13 +63,21 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Unauthorized - token expired or invalid
       localStorage.removeItem('auth-token')
+      localStorage.removeItem('auth-token-data')
+      localStorage.removeItem('user-data')
       window.location.href = '/login'
     } else if (error.response?.status === 403) {
       // Forbidden
-      console.error('Access forbidden')
+      console.error('Access forbidden:', error.response?.data?.message || 'Insufficient permissions')
+    } else if (error.response?.status === 422) {
+      // Validation error
+      console.error('Validation error:', error.response.data)
+    } else if (error.response?.status === 429) {
+      // Rate limiting
+      console.error('Too many requests, please try again later')
     } else if (error.response?.status >= 500) {
       // Server error
-      console.error('Server error:', error.response.data)
+      console.error('Server error:', error.response?.data?.message || 'Internal server error')
     }
     
     return Promise.reject(error)
@@ -70,26 +87,7 @@ api.interceptors.response.use(
 // Helper functions for common HTTP methods
 export const apiService = {
   get: (url, config = {}) => api.get(url, config),
-  post: (url, data = {}, config = {}) => {
-    // Special handling for contacts endpoint - use proxy
-    if (url === '/contacts') {
-      return fetch('https://vincenzorocca.com/api-proxy.php/v1/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(data)
-      }).then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-        return response.json().then(jsonData => ({ data: jsonData }))
-      })
-    }
-    return api.post(url, data, config)
-  },
+  post: (url, data = {}, config = {}) => api.post(url, data, config),
   put: (url, data = {}, config = {}) => api.put(url, data, config),
   patch: (url, data = {}, config = {}) => api.patch(url, data, config),
   delete: (url, config = {}) => api.delete(url, config)
