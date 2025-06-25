@@ -40,6 +40,16 @@ Route::prefix('v1/auth')->group(function () {
 // Rotte pubbliche (senza autenticazione)
 Route::prefix('v1')->group(function () {
 
+    // Test route
+    Route::get('/test', function () {
+        return response()->json([
+            'message' => 'Laravel API funziona su Hostinger!',
+            'timestamp' => now(),
+            'server' => request()->server('SERVER_NAME'),
+            'php_version' => PHP_VERSION
+        ]);
+    });
+
     // Progetti - rotte pubbliche
     Route::get('/projects', [ProjectController::class, 'index']);
     Route::get('/projects/featured', [ProjectController::class, 'featured']);

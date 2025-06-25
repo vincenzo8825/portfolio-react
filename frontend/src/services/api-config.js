@@ -1,12 +1,10 @@
-// Override API configuration per usare l'API PHP diretta (debug.php)
-// invece dell'API Laravel che non funziona su Hostinger
+// API configuration per Laravel backend su Hostinger
+const API_BASE_URL = 'https://vincenzorocca.com/api/v1'
 
-const API_BASE_URL = 'https://vincenzorocca.com'
-
-// Helper per le chiamate API dirette al debug.php
+// Helper per le chiamate API Laravel
 export const directAPI = {
   async callEndpoint(endpoint, method = 'GET', data = null) {
-    const url = `${API_BASE_URL}/debug.php?endpoint=${endpoint}`
+    const url = `${API_BASE_URL}/${endpoint}`
     
     const options = {
       method: method,
@@ -60,8 +58,8 @@ export const directAPI = {
   },
 
   async sendContact(contactData) {
-    // Usa il proxy API per i contatti invece del debug.php
-    const url = `${API_BASE_URL}/api-proxy.php/v1/contacts`
+    // Usa l'API Laravel per i contatti
+    const url = `${API_BASE_URL}/contacts`
     
     try {
       const response = await fetch(url, {
@@ -92,7 +90,7 @@ export const directAPI = {
 
   // NUOVI METODI PER PROGETTI ADMIN
   async createProject(projectData) {
-    const url = `${API_BASE_URL}/api/v1/admin/projects`
+    const url = `${API_BASE_URL}/admin/projects`
     
     const token = localStorage.getItem('auth-token')
     
@@ -120,7 +118,7 @@ export const directAPI = {
   },
 
   async updateProject(id, projectData) {
-    const url = `${API_BASE_URL}/api/v1/admin/projects?id=${id}`
+    const url = `${API_BASE_URL}/admin/projects/${id}`
     
     const token = localStorage.getItem('auth-token')
     
@@ -148,7 +146,7 @@ export const directAPI = {
   },
 
   async getProjectById(id) {
-    const url = `${API_BASE_URL}/api/v1/admin/projects?id=${id}`
+    const url = `${API_BASE_URL}/admin/projects/${id}`
     
     const token = localStorage.getItem('auth-token')
     
@@ -175,7 +173,7 @@ export const directAPI = {
 
   // UPLOAD IMMAGINI
   async uploadImage(imageFile) {
-    const url = `${API_BASE_URL}/api/v1/admin/upload/image`
+    const url = `${API_BASE_URL}/admin/upload/image`
     
     const token = localStorage.getItem('auth-token')
     const formData = new FormData()
