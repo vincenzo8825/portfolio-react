@@ -32,7 +32,8 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
   const adminNavItems = [
     { path: '/admin', label: t('dashboard'), icon: 'fas fa-tachometer-alt', gradient: 'from-indigo-500 to-purple-500' },
     { path: '/admin/projects', label: t('projectManagement'), icon: 'fas fa-folder-open', gradient: 'from-blue-500 to-cyan-500' },
-    { path: '/admin/projects/create', label: t('newProject'), icon: 'fas fa-plus', gradient: 'from-green-500 to-emerald-500' }
+    { path: '/admin/projects/create', label: t('newProject'), icon: 'fas fa-plus', gradient: 'from-green-500 to-emerald-500' },
+    { path: '/admin/change-password', label: t('changePassword'), icon: 'fas fa-key', gradient: 'from-orange-500 to-red-500' }
   ]
 
   const navItems = isAdmin ? adminNavItems : publicNavItems
@@ -221,6 +222,18 @@ const Sidebar = ({ isOpen, onClose, isAdmin }) => {
                     <i className="fas fa-folder-open text-base"></i>
                   </div>
                   <span className="flex-1">{t('manageProjects')}</span>
+                  <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+                </Link>
+
+                <Link
+                  to="/admin/change-password"
+                  onClick={onClose}
+                  className="group flex items-center px-4 py-3.5 text-sm font-medium rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-orange-100/80 hover:to-red-100/80 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 transition-all duration-300 relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mr-3 text-white shadow-lg">
+                    <i className="fas fa-key text-base"></i>
+                  </div>
+                  <span className="flex-1">{t('changePassword')}</span>
                   <i className="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
                 </Link>
               </div>

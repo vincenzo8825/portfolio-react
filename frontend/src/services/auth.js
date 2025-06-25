@@ -1,71 +1,41 @@
 import { apiService } from './api'
+import { authServiceOverride } from './api-config'
 
 export const authService = {
-  // Login user
+  // Login user - ora usa l'API diretta
   async login(credentials) {
-    const response = await apiService.post('/auth/login', credentials)
-    
-    // Handle Laravel response format
-    if (response.data.success) {
-      // Store token from Laravel response
-      if (response.data.data?.token) {
-        this.setToken(response.data.data.token)
-      }
-      return response.data
-    } else {
-      throw new Error(response.data.message || 'Login failed')
-    }
+    // Usa l'override per l'API diretta
+    return await authServiceOverride.login(credentials)
   },
 
-  // Logout user
+  // Logout user - ora usa l'API diretta
   async logout() {
-    try {
-      await apiService.post('/auth/logout')
-    } catch (error) {
-      // Don't throw error on logout, just log it
-      console.error('Logout error:', error)
-    } finally {
-      // Always remove token on logout
-      this.removeToken()
-    }
+    await authServiceOverride.logout()
   },
 
-  // Get current authenticated user
+  // Get current authenticated user - ora usa l'API diretta
   async getCurrentUser() {
-    const response = await apiService.get('/auth/me')
-    
-    if (response.data.success) {
-      return response.data.data
-    } else {
-      throw new Error(response.data.message || 'Failed to get user')
-    }
+    return await authServiceOverride.getCurrentUser()
   },
 
   // Check if user is authenticated
   isAuthenticated() {
-    return !!localStorage.getItem('auth-token')
+    return authServiceOverride.isAuthenticated()
   },
 
   // Get auth token
   getToken() {
-    return localStorage.getItem('auth-token')
+    return authServiceOverride.getToken()
   },
 
   // Set auth token with expiration
   setToken(token) {
-    const tokenData = {
-      token: token,
-      timestamp: Date.now(),
-      expires: Date.now() + (24 * 60 * 60 * 1000) // 24 ore
-    }
-    localStorage.setItem('auth-token', token)
-    localStorage.setItem('auth-token-data', JSON.stringify(tokenData))
+    authServiceOverride.setToken(token)
   },
 
   // Remove auth token
   removeToken() {
-    localStorage.removeItem('auth-token')
-    localStorage.removeItem('auth-token-data')
+    authServiceOverride.removeToken()
   },
 
   // Check if token is expired

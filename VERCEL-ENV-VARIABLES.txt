@@ -1,0 +1,12 @@
+# 🚀 VARIABILI D'AMBIENTE PER VERCEL
+# Copia queste variabili nel Dashboard Vercel → Settings → Environment Variables
+
+VITE_API_BASE_URL=https://vincenzorocca.com/api/v1
+VITE_APP_NAME=Vincenzo Rocca Portfolio
+VITE_APP_ENV=production
+VITE_APP_URL=https://vincenzorocca.com
+VITE_ADMIN_EMAIL=vincenzorocca88@gmail.com
+VITE_CLOUDINARY_CLOUD_NAME=djt2a7xwk
+VITE_SITE_NAME=Vincenzo Rocca Portfolio
+VITE_SITE_DESCRIPTION=Portfolio di Vincenzo Rocca, Full Stack Developer
+VITE_SITE_KEYWORDS=Vincenzo Rocca, Full Stack Developer, React, Laravel 

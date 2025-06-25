@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Base API configuration - Updated for Laravel backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://vincenzorocca.com/api/v1'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -70,7 +70,26 @@ api.interceptors.response.use(
 // Helper functions for common HTTP methods
 export const apiService = {
   get: (url, config = {}) => api.get(url, config),
-  post: (url, data = {}, config = {}) => api.post(url, data, config),
+  post: (url, data = {}, config = {}) => {
+    // Special handling for contacts endpoint - use proxy
+    if (url === '/contacts') {
+      return fetch('https://vincenzorocca.com/api-proxy.php/v1/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(data)
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+        return response.json().then(jsonData => ({ data: jsonData }))
+      })
+    }
+    return api.post(url, data, config)
+  },
   put: (url, data = {}, config = {}) => api.put(url, data, config),
   patch: (url, data = {}, config = {}) => api.patch(url, data, config),
   delete: (url, config = {}) => api.delete(url, config)

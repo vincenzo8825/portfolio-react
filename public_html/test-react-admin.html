@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚛️ Test React Admin - Portfolio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .card-header { font-size: 1.5rem; font-weight: 600; color: #374151; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        
+        .btn { display: inline-block; padding: 12px 24px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; margin-right: 12px; margin-bottom: 12px; text-decoration: none; color: white; }
+        .btn-primary { background: #3b82f6; }
+        .btn-success { background: #10b981; }
+        .btn-danger { background: #ef4444; }
+        .btn-warning { background: #f59e0b; }
+        
+        .status { padding: 16px; border-radius: 12px; margin: 16px 0; font-weight: 500; }
+        .status-success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .status-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .status-info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
+        
+        .result-box { background: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-height: 200px; overflow-y: auto; }
+        pre { background: #1f2937; color: #e5e7eb; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚛️ Test React Admin</h1>
+            <p>Test completo di tutti gli endpoint che React usa per l'admin</p>
+        </div>
+
+        <!-- Login Status -->
+        <div class="card">
+            <div class="card-header">🔐 Status Autenticazione</div>
+            <button onclick="doLogin()" class="btn btn-primary">🔓 Login</button>
+            <button onclick="checkAuth()" class="btn btn-success">✅ Verifica Auth</button>
+            <button onclick="clearAuth()" class="btn btn-danger">🗑️ Clear Token</button>
+            <div id="auth-status" class="result-box" style="display:none;"></div>
+        </div>
+
+        <div class="grid">
+            <!-- Test API -->
+            <div class="card">
+                <div class="card-header">🔧 Test API</div>
+                <button onclick="testApiRouting()" class="btn btn-primary">🧪 Test Routing</button>
+                <div id="api-result" class="result-box" style="display:none;"></div>
+            </div>
+
+            <!-- Test Progetti -->
+            <div class="card">
+                <div class="card-header">🚀 Test Progetti</div>
+                <button onclick="getProjects()" class="btn btn-primary">📋 Lista Progetti</button>
+                <button onclick="createProject()" class="btn btn-success">➕ Crea Progetto</button>
+                <button onclick="updateProject()" class="btn btn-warning">✏️ Aggiorna Progetto</button>
+                <button onclick="deleteProject()" class="btn btn-danger">🗑️ Elimina Progetto</button>
+                <div id="projects-result" class="result-box" style="display:none;"></div>
+            </div>
+
+            <!-- Test Upload -->
+            <div class="card">
+                <div class="card-header">🖼️ Test Upload</div>
+                <button onclick="testUpload()" class="btn btn-primary">📤 Test Upload</button>
+                <button onclick="testUploadReal()" class="btn btn-success">📸 Upload Reale</button>
+                <input type="file" id="file-input" accept="image/*" style="margin: 10px 0;">
+                <div id="upload-result" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- Console -->
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-header">🖥️ Console Test</div>
+            <button onclick="runAllTests()" class="btn btn-danger">🚀 Esegui Tutti i Test</button>
+            <button onclick="clearConsole()" class="btn btn-warning">🗑️ Pulisci</button>
+            <pre id="console">Test React Admin inizializzato
+Timestamp: <?= date('Y-m-d H:i:s') ?>
+========================</pre>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('auth-token') || null;
+        let lastProjectId = null;
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            console.innerHTML += `\n[${timestamp}] ${prefix} ${message}`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result-box status-${type}`;
+            element.innerHTML = message;
+        }
+
+        async function doLogin() {
+            log('Attempting login...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/debug.php?endpoint=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'vincenzorocca88@gmail.com',
+                        password: 'admin123'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    authToken = result.token;
+                    localStorage.setItem('auth-token', authToken);
+                    showResult('auth-status', `✅ Login riuscito! Token: ${authToken.substring(0, 20)}...`, 'success');
+                    log(`Login successful, token saved`, 'success');
+                } else {
+                    showResult('auth-status', `❌ Login fallito: ${result.message}`, 'error');
+                    log(`Login failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-status', `❌ Errore: ${error.message}`, 'error');
+                log(`Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkAuth() {
+            if (!authToken) {
+                showResult('auth-status', '❌ Nessun token presente', 'error');
+                return;
+            }
+
+            log('Checking authentication...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/debug.php?endpoint=auth/me', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('auth-status', `✅ Autenticato come: ${result.user.name} (${result.user.email})`, 'success');
+                    log(`Auth check successful: ${result.user.name}`, 'success');
+                } else {
+                    showResult('auth-status', `❌ Auth fallita: ${result.message}`, 'error');
+                    log(`Auth check failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-status', `❌ Errore auth: ${error.message}`, 'error');
+                log(`Auth error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAuth() {
+            authToken = null;
+            localStorage.removeItem('auth-token');
+            showResult('auth-status', '🗑️ Token rimosso', 'info');
+            log('Token cleared');
+        }
+
+        async function getProjects() {
+            if (!authToken) {
+                showResult('projects-result', '❌ Login richiesto', 'error');
+                return;
+            }
+
+            log('Getting projects...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/api/v1/admin/projects', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('projects-result', `✅ ${result.data.length} progetti trovati:<br><pre>${JSON.stringify(result.data, null, 2)}</pre>`, 'success');
+                    log(`Found ${result.data.length} projects`, 'success');
+                    if (result.data.length > 0) {
+                        lastProjectId = result.data[0].id;
+                    }
+                } else {
+                    showResult('projects-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`Get projects failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('projects-result', `❌ Errore: ${error.message}`, 'error');
+                log(`Get projects error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createProject() {
+            if (!authToken) {
+                showResult('projects-result', '❌ Login richiesto', 'error');
+                return;
+            }
+
+            const projectData = {
+                title: 'Test React Admin ' + Date.now(),
+                description: 'Progetto di test creato da React Admin',
+                technologies: ['React', 'PHP', 'MySQL'],
+                category: 'web',
+                status: 'completed',
+                demo_url: 'https://vincenzorocca.com',
+                github_url: 'https://github.com/vincenzorocca'
+            };
+
+            log('Creating project...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/api/v1/admin/projects', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    lastProjectId = result.data.id;
+                    showResult('projects-result', `✅ Progetto creato! ID: ${result.data.id}`, 'success');
+                    log(`Project created successfully: ID ${result.data.id}`, 'success');
+                } else {
+                    showResult('projects-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`Create project failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('projects-result', `❌ Errore: ${error.message}`, 'error');
+                log(`Create project error: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateProject() {
+            if (!authToken || !lastProjectId) {
+                showResult('projects-result', '❌ Login e progetto richiesti', 'error');
+                return;
+            }
+
+            const updateData = {
+                title: 'Test React Admin AGGIORNATO ' + Date.now(),
+                description: 'Progetto aggiornato da React Admin',
+                technologies: ['React', 'PHP', 'MySQL', 'Laravel']
+            };
+
+            log(`Updating project ${lastProjectId}...`);
+            try {
+                const response = await fetch(`https://vincenzorocca.com/api/v1/admin/projects?id=${lastProjectId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('projects-result', `✅ Progetto aggiornato! ID: ${lastProjectId}`, 'success');
+                    log(`Project updated successfully: ID ${lastProjectId}`, 'success');
+                } else {
+                    showResult('projects-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`Update project failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('projects-result', `❌ Errore: ${error.message}`, 'error');
+                log(`Update project error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteProject() {
+            if (!authToken || !lastProjectId) {
+                showResult('projects-result', '❌ Login e progetto richiesti', 'error');
+                return;
+            }
+
+            log(`Deleting project ${lastProjectId}...`);
+            try {
+                const response = await fetch(`https://vincenzorocca.com/api/v1/admin/projects?id=${lastProjectId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('projects-result', `✅ Progetto eliminato! ID: ${lastProjectId}`, 'success');
+                    log(`Project deleted successfully: ID ${lastProjectId}`, 'success');
+                    lastProjectId = null;
+                } else {
+                    showResult('projects-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`Delete project failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('projects-result', `❌ Errore: ${error.message}`, 'error');
+                log(`Delete project error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpload() {
+            if (!authToken) {
+                showResult('upload-result', '❌ Login richiesto', 'error');
+                return;
+            }
+
+            log('Testing upload (simulation)...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/api/v1/admin/upload/image', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('upload-result', `✅ Upload simulato! URL: ${result.data.url}`, 'success');
+                    log(`Upload simulation successful: ${result.data.url}`, 'success');
+                } else {
+                    showResult('upload-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`Upload simulation failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('upload-result', `❌ Errore: ${error.message}`, 'error');
+                log(`Upload simulation error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUploadReal() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+
+            if (!authToken) {
+                showResult('upload-result', '❌ Login richiesto', 'error');
+                return;
+            }
+
+            if (!file) {
+                showResult('upload-result', '❌ Seleziona un file', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            log('Uploading real file...');
+            try {
+                const response = await fetch('https://vincenzorocca.com/api/v1/admin/upload/image', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('upload-result', `✅ File caricato! URL: ${result.data.url}<br>Size: ${result.data.size} bytes`, 'success');
+                    log(`File uploaded successfully: ${result.data.url}`, 'success');
+                } else {
+                    showResult('upload-result', `❌ Errore: ${result.message}`, 'error');
+                    log(`File upload failed: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('upload-result', `❌ Errore: ${error.message}`, 'error');
+                log(`File upload error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test API routing
+        async function testApiRouting() {
+            log('ℹ️ Testing API routing...');
+            try {
+                const response = await fetch('/api/v1/test.php');
+                const data = await response.json();
+                if (data.success) {
+                    showResult('api-result', `✅ API routing successful: ${data.message}<br>Method: ${data.method}<br>URI: ${data.uri}`, 'success');
+                    log('✅ API routing test successful: ' + data.message);
+                } else {
+                    showResult('api-result', `❌ API routing failed: ${data.message}`, 'error');
+                    log('❌ API routing test failed: ' + data.message);
+                }
+            } catch (error) {
+                showResult('api-result', `❌ API routing error: ${error.message}`, 'error');
+                log('❌ API routing error: ' + error.message);
+            }
+        }
+
+        async function runAllTests() {
+            log('=== STARTING ALL REACT ADMIN TESTS ===');
+            
+            await testApiRouting();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await doLogin();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await checkAuth();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await getProjects();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await createProject();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await updateProject();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await testUpload();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            await deleteProject();
+            
+            log('=== ALL REACT ADMIN TESTS COMPLETED ===');
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = 'Console pulita\nTimestamp: ' + new Date().toLocaleString();
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('React Admin test initialized');
+            if (authToken) {
+                log('Existing token found: ' + authToken.substring(0, 20) + '...');
+            }
+        };
+    </script>
+</body>
+</html> 

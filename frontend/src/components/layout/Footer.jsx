@@ -60,7 +60,7 @@ const Footer = () => {
               © 2025 Vincenzo Rocca. Tutti i diritti riservati.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 text-center md:text-right">
-              Realizzato con <span className="text-red-500">❤️</span> usando React, Laravel, Angular e Tailwind CSS
+              Realizzato con <span className="text-red-500">❤️</span> usando React, Laravel e Tailwind CSS
             </p>
           </div>
         </div>

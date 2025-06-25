@@ -10,9 +10,11 @@ import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
+import NotFound from './pages/NotFound'
 import Dashboard from './pages/admin/Dashboard'
 import ProjectsList from './pages/admin/ProjectsList'
 import ProjectForm from './pages/admin/ProjectForm'
+import ChangePassword from './pages/admin/ChangePassword'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import AOS from 'aos'
@@ -67,21 +69,14 @@ function App() {
                       <ProjectForm />
                     </ProtectedRoute>
                   } />
+                  <Route path="/admin/change-password" element={
+                    <ProtectedRoute>
+                      <ChangePassword />
+                    </ProtectedRoute>
+                  } />
                   
                   {/* Catch all - 404 */}
-                  <Route path="*" element={
-                    <div className="flex items-center justify-center min-h-screen">
-                      <div className="text-center">
-                        <h1 className="text-6xl font-bold text-gray-400 mb-4">404</h1>
-                        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                          Pagina non trovata
-                        </p>
-                        <a href="/" className="btn-primary">
-                          Torna alla Home
-                        </a>
-                      </div>
-                    </div>
-                  } />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
               </Router>

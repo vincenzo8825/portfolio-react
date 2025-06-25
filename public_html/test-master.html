@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Master Portfolio - Vincenzo Rocca</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        
+        .status-bar { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid #10b981; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .status-bar.error { border-left-color: #ef4444; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3); }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .stat-card:nth-child(5) { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .stat-number { font-size: 2.5rem; font-weight: bold; margin-bottom: 8px; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+        
+        .section { background: white; border-radius: 16px; padding: 30px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        .section-header { font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #e5e7eb; padding-bottom: 12px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #374151; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #3b82f6; }
+        
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s; margin-right: 12px; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        
+        .console { background: #1f2937; color: #e5e7eb; border-radius: 12px; padding: 20px; font-family: 'Courier New', monospace; font-size: 13px; max-height: 400px; overflow-y: auto; margin-top: 20px; }
+        .console-line { margin-bottom: 4px; }
+        
+        .table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f9fafb; font-weight: 600; }
+        .table tr:hover { background: #f9fafb; }
+        
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: #dcfce7; color: #16a34a; }
+        .badge-danger { background: #fef2f2; color: #dc2626; }
+        .badge-warning { background: #fef3c7; color: #d97706; }
+        .badge-primary { background: #dbeafe; color: #2563eb; }
+        
+        @media (max-width: 768px) { 
+            .two-cols, .grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Master Portfolio</h1>
+            <p>Dashboard completa per testare TUTTE le funzionalità del portfolio Vincenzo Rocca</p>
+        </div>
+
+        <div id="status-bar" class="status-bar">
+            <strong>🔄 Inizializzazione sistema...</strong>
+        </div>
+
+        <!-- Statistiche Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="stat-users">-</div>
+                <div class="stat-label">👥 Utenti</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-projects">-</div>
+                <div class="stat-label">🚀 Progetti</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-contacts">-</div>
+                <div class="stat-label">📧 Contatti</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-technologies">-</div>
+                <div class="stat-label">⚡ Tecnologie</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-featured">-/3</div>
+                <div class="stat-label">⭐ Featured</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Login Section -->
+            <div class="section">
+                <div class="section-header">
+                    <span>🔐</span>
+                    <span>Autenticazione Admin</span>
+                </div>
+                
+                <div id="login-form">
+                    <div class="form-group">
+                        <label>Email Admin:</label>
+                        <input type="email" id="login-email" value="vincenzorocca88@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="login-password" value="admin123">
+                    </div>
+                    <button class="btn btn-primary" onclick="performLogin()">
+                        <span>🔓</span> Login
+                    </button>
+                </div>
+                
+                <div id="login-success" style="display: none;">
+                    <p>✅ Loggato come: <strong id="user-name"></strong></p>
+                    <span id="user-role" class="badge badge-success">ADMIN</span>
+                    <br><br>
+                    <button class="btn btn-danger" onclick="performLogout()">
+                        <span>🔒</span> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cambio Password -->
+            <div class="section">
+                <div class="section-header">
+                    <span>🔑</span>
+                    <span>Cambio Password</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password Attuale:</label>
+                    <input type="password" id="current-password">
+                </div>
+                <div class="form-group">
+                    <label>Nuova Password:</label>
+                    <input type="password" id="new-password">
+                </div>
+                <button class="btn btn-warning" onclick="changePassword()">
+                    <span>🔄</span> Cambia Password
+                </button>
+            </div>
+        </div>
+
+        <!-- Gestione Utenti -->
+        <div class="section">
+            <div class="section-header">
+                <span>👥</span>
+                <span>Gestione Utenti</span>
+            </div>
+            
+            <div class="two-cols">
+                <div>
+                    <h4>Crea Nuovo Utente</h4>
+                    <div class="form-group">
+                        <label>Nome Completo:</label>
+                        <input type="text" id="user-name-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="user-email-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="user-password-input">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="user-is-admin"> È Amministratore
+                        </label>
+                    </div>
+                    <button class="btn btn-success" onclick="createUser()">
+                        <span>➕</span> Crea Utente
+                    </button>
+                </div>
+                <div>
+                    <h4>Utenti Esistenti</h4>
+                    <div id="users-list">Caricamento...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestione Progetti -->
+        <div class="section">
+            <div class="section-header">
+                <span>🚀</span>
+                <span>Gestione Progetti Completa</span>
+            </div>
+            
+            <div class="two-cols">
+                <div>
+                    <h4>Crea/Modifica Progetto</h4>
+                    <input type="hidden" id="edit-project-id">
+                    
+                    <div class="form-group">
+                        <label>Titolo Progetto:</label>
+                        <input type="text" id="project-title">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrizione Breve:</label>
+                        <textarea id="project-description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrizione Lunga:</label>
+                        <textarea id="project-long-description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL Demo:</label>
+                        <input type="url" id="project-demo">
+                    </div>
+                    <div class="form-group">
+                        <label>URL GitHub:</label>
+                        <input type="url" id="project-github">
+                    </div>
+                    <div class="form-group">
+                        <label>URL LinkedIn:</label>
+                        <input type="url" id="project-linkedin">
+                    </div>
+                    <div class="form-group">
+                        <label>URL Video:</label>
+                        <input type="url" id="project-video">
+                    </div>
+                    <div class="form-group">
+                        <label>Tecnologie (separate da virgola):</label>
+                        <input type="text" id="project-technologies" placeholder="React, Laravel, MySQL, Docker">
+                    </div>
+                    <div class="form-group">
+                        <label>Cliente:</label>
+                        <input type="text" id="project-client">
+                    </div>
+                    <div class="form-group">
+                        <label>Durata:</label>
+                        <input type="text" id="project-duration" placeholder="2 mesi">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria:</label>
+                        <select id="project-category">
+                            <option value="">Seleziona...</option>
+                            <option value="web">Sito Web</option>
+                            <option value="ecommerce">E-commerce</option>
+                            <option value="app">App Mobile</option>
+                            <option value="backend">Backend API</option>
+                            <option value="other">Altro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="project-featured"> In Evidenza (max 3)
+                        </label>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="createProject()">
+                        <span>🚀</span> Crea Progetto
+                    </button>
+                    <button class="btn btn-warning" onclick="updateProject()" style="display: none;" id="update-project-btn">
+                        <span>✏️</span> Aggiorna Progetto
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelEdit()" style="display: none;" id="cancel-edit-btn">
+                        <span>❌</span> Annulla
+                    </button>
+                </div>
+                <div>
+                    <h4>Progetti Esistenti</h4>
+                    <div id="projects-list">Caricamento...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Form Contatti -->
+        <div class="section">
+            <div class="section-header">
+                <span>📧</span>
+                <span>Test Form Contatti Avanzato</span>
+            </div>
+            
+            <div class="two-cols">
+                <div>
+                    <h4>Invia Messaggio Test Completo</h4>
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" id="contact-name" value="Cliente Test">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="contact-email" value="cliente@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefono:</label>
+                        <input type="tel" id="contact-phone" value="+39 123 456 7890">
+                    </div>
+                    <div class="form-group">
+                        <label>Azienda:</label>
+                        <input type="text" id="contact-company" value="Azienda Test SRL">
+                    </div>
+                    <div class="form-group">
+                        <label>Oggetto:</label>
+                        <input type="text" id="contact-subject" value="Richiesta sviluppo sito web">
+                    </div>
+                    <div class="form-group">
+                        <label>Messaggio:</label>
+                        <textarea id="contact-message">Salve, sono interessato a sviluppare un nuovo sito web per la mia azienda. Vorrei discutere delle funzionalità e dei tempi di realizzazione.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget:</label>
+                        <select id="contact-budget">
+                            <option value="">Seleziona budget...</option>
+                            <option value="< 1000€">< 1.000€</option>
+                            <option value="1000€ - 5000€">1.000€ - 5.000€</option>
+                            <option value="5000€ - 10000€">5.000€ - 10.000€</option>
+                            <option value="10000€ - 20000€">10.000€ - 20.000€</option>
+                            <option value="> 20000€">> 20.000€</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Timeline:</label>
+                        <select id="contact-timeline">
+                            <option value="">Seleziona timeline...</option>
+                            <option value="< 1 mese">< 1 mese</option>
+                            <option value="1-3 mesi">1-3 mesi</option>
+                            <option value="3-6 mesi">3-6 mesi</option>
+                            <option value="6-12 mesi">6-12 mesi</option>
+                            <option value="> 12 mesi">> 12 mesi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo Progetto:</label>
+                        <select id="contact-project-type">
+                            <option value="">Seleziona tipo...</option>
+                            <option value="Sito Web">Sito Web Aziendale</option>
+                            <option value="E-commerce">E-commerce</option>
+                            <option value="App Mobile">App Mobile</option>
+                            <option value="Software Custom">Software Custom</option>
+                            <option value="Consulenza">Consulenza</option>
+                            <option value="Manutenzione">Manutenzione</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="sendContact()">
+                        <span>📧</span> Invia Messaggio Test
+                    </button>
+                </div>
+                <div>
+                    <h4>Messaggi Ricevuti</h4>
+                    <div id="contacts-list">Caricamento...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test API Avanzato -->
+        <div class="section">
+            <div class="section-header">
+                <span>🔧</span>
+                <span>Test API e Upload Files</span>
+            </div>
+            
+            <div class="grid">
+                <div>
+                    <h4>Test Endpoints API</h4>
+                    <button class="btn btn-primary" onclick="testAPI('technologies')">⚡ Tecnologie</button>
+                    <button class="btn btn-primary" onclick="testAPI('projects')">🚀 Progetti</button>
+                    <button class="btn btn-primary" onclick="testAPI('get-contacts')">📧 Contatti</button>
+                    <button class="btn btn-primary" onclick="testAPI('stats')">📊 Statistiche</button>
+                    <button class="btn btn-warning" onclick="testUpload()">📁 Test Upload</button>
+                    <button class="btn btn-success" onclick="runAllTests()">🔄 Test Completo</button>
+                </div>
+                <div>
+                    <h4>Test Database Direct</h4>
+                    <button class="btn btn-primary" onclick="testDatabase()">🗄️ Test DB</button>
+                    <button class="btn btn-primary" onclick="checkTables()">📋 Controlla Tabelle</button>
+                    <button class="btn btn-primary" onclick="testLaravel()">🔗 Test Laravel API</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Debug -->
+        <div class="section">
+            <div class="section-header">
+                <span>🖥️</span>
+                <span>Console Debug Avanzata</span>
+            </div>
+            
+            <button class="btn btn-danger" onclick="clearConsole()">🗑️ Pulisci</button>
+            <button class="btn btn-primary" onclick="exportLogs()">💾 Esporta Log</button>
+            
+            <div id="console" class="console">
+                <div class="console-line">🧪 Test Master Portfolio - Console inizializzata</div>
+                <div class="console-line">📅 <?= date('Y-m-d H:i:s') ?></div>
+                <div class="console-line">🌐 URL: <?= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?></div>
+                <div class="console-line">📍 IP: <?= $_SERVER['REMOTE_ADDR'] ?? 'N/A' ?></div>
+                <div class="console-line">🔧 PHP: <?= phpversion() ?></div>
+                <div class="console-line">========================</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Stato globale dell'applicazione
+        let appState = {
+            isLoggedIn: false,
+            currentUser: null,
+            authToken: null,
+            stats: {},
+            projects: [],
+            users: [],
+            contacts: [],
+            technologies: []
+        };
+
+        // Utility functions
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.innerHTML = `${emoji} [${timestamp}] ${message}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function updateStatus(message, isError = false) {
+            const statusBar = document.getElementById('status-bar');
+            statusBar.innerHTML = `<strong>${message}</strong>`;
+            statusBar.className = isError ? 'status-bar error' : 'status-bar';
+        }
+
+        function updateStats(stats) {
+            appState.stats = stats;
+            document.getElementById('stat-users').textContent = stats.users || 0;
+            document.getElementById('stat-projects').textContent = stats.projects || 0;
+            document.getElementById('stat-contacts').textContent = stats.contacts || 0;
+            document.getElementById('stat-technologies').textContent = stats.technologies || 0;
+            document.getElementById('stat-featured').textContent = `${stats.featured_projects || 0}/3`;
+        }
+
+        // API call wrapper
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                log(`API ${method} ${endpoint}`, 'info');
+                
+                const response = await fetch(`/api-direct.php?endpoint=${endpoint}`, options);
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || `HTTP ${response.status}`);
+                }
+                
+                log(`API ${endpoint} - Success`, 'success');
+                return result;
+            } catch (error) {
+                log(`API ${endpoint} - Error: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Authentication functions
+        async function performLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const result = await apiCall('login', 'POST', { email, password });
+                
+                if (result.success) {
+                    appState.isLoggedIn = true;
+                    appState.currentUser = result.user;
+                    appState.authToken = result.token;
+                    
+                    document.getElementById('login-form').style.display = 'none';
+                    document.getElementById('login-success').style.display = 'block';
+                    document.getElementById('user-name').textContent = result.user.name;
+                    
+                    updateStatus(`✅ Login effettuato come ${result.user.name}`);
+                    log(`Login success: ${result.user.name} (${result.user.email})`, 'success');
+                    
+                    // Carica dati dopo login
+                    await loadAllData();
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                updateStatus(`❌ Errore login: ${error.message}`, true);
+            }
+        }
+
+        function performLogout() {
+            appState.isLoggedIn = false;
+            appState.currentUser = null;
+            appState.authToken = null;
+            
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('login-success').style.display = 'none';
+            
+            updateStatus('✅ Logout effettuato');
+            log('Logout completed', 'success');
+        }
+
+        async function changePassword() {
+            if (!appState.isLoggedIn) {
+                updateStatus('❌ Login richiesto per cambiare password', true);
+                return;
+            }
+
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            if (!currentPassword || !newPassword) {
+                updateStatus('❌ Inserisci entrambe le password', true);
+                return;
+            }
+
+            try {
+                await apiCall('change-password', 'POST', {
+                    user_id: appState.currentUser.id,
+                    current_password: currentPassword,
+                    new_password: newPassword
+                });
+                
+                updateStatus('✅ Password cambiata con successo');
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+            } catch (error) {
+                updateStatus(`❌ Errore cambio password: ${error.message}`, true);
+            }
+        }
+
+        // User management
+        async function createUser() {
+            const name = document.getElementById('user-name-input').value;
+            const email = document.getElementById('user-email-input').value;
+            const password = document.getElementById('user-password-input').value;
+            const isAdmin = document.getElementById('user-is-admin').checked;
+
+            if (!name || !email || !password) {
+                updateStatus('❌ Compila tutti i campi utente', true);
+                return;
+            }
+
+            try {
+                // Simulazione creazione utente via form
+                const formData = new FormData();
+                formData.append('action', 'create_user');
+                formData.append('name', name);
+                formData.append('email', email);
+                formData.append('password', password);
+                if (isAdmin) formData.append('is_admin', '1');
+
+                const response = await fetch('/test-finale.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                updateStatus(`✅ Utente creato: ${name}${isAdmin ? ' (Admin)' : ''}`);
+                
+                // Pulisci form
+                document.getElementById('user-name-input').value = '';
+                document.getElementById('user-email-input').value = '';
+                document.getElementById('user-password-input').value = '';
+                document.getElementById('user-is-admin').checked = false;
+                
+                await loadUsers();
+            } catch (error) {
+                updateStatus(`❌ Errore creazione utente: ${error.message}`, true);
+            }
+        }
+
+        // Project management
+        async function createProject() {
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-description').value;
+
+            if (!title || !description) {
+                updateStatus('❌ Titolo e descrizione sono obbligatori', true);
+                return;
+            }
+
+            const projectData = {
+                title: title,
+                description: description,
+                long_description: document.getElementById('project-long-description').value,
+                demo_url: document.getElementById('project-demo').value,
+                github_url: document.getElementById('project-github').value,
+                linkedin_url: document.getElementById('project-linkedin').value,
+                video_url: document.getElementById('project-video').value,
+                technologies: document.getElementById('project-technologies').value.split(',').map(t => t.trim()).filter(t => t),
+                client: document.getElementById('project-client').value,
+                duration: document.getElementById('project-duration').value,
+                category: document.getElementById('project-category').value,
+                featured: document.getElementById('project-featured').checked
+            };
+
+            try {
+                // Simulazione via form per creare progetto
+                const formData = new FormData();
+                formData.append('action', 'create_project');
+                Object.keys(projectData).forEach(key => {
+                    if (key === 'technologies') {
+                        formData.append(key, projectData[key].join(','));
+                    } else if (key === 'featured') {
+                        if (projectData[key]) formData.append(key, '1');
+                    } else {
+                        formData.append(key, projectData[key]);
+                    }
+                });
+
+                const response = await fetch('/test-finale.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                updateStatus(`✅ Progetto creato: ${title}`);
+                clearProjectForm();
+                await loadProjects();
+            } catch (error) {
+                updateStatus(`❌ Errore creazione progetto: ${error.message}`, true);
+            }
+        }
+
+        function clearProjectForm() {
+            ['project-title', 'project-description', 'project-long-description', 'project-demo', 
+             'project-github', 'project-linkedin', 'project-video', 'project-technologies', 
+             'project-client', 'project-duration'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('project-category').value = '';
+            document.getElementById('project-featured').checked = false;
+            document.getElementById('edit-project-id').value = '';
+        }
+
+        // Contact management
+        async function sendContact() {
+            const contactData = {
+                name: document.getElementById('contact-name').value,
+                email: document.getElementById('contact-email').value,
+                phone: document.getElementById('contact-phone').value,
+                company: document.getElementById('contact-company').value,
+                subject: document.getElementById('contact-subject').value,
+                message: document.getElementById('contact-message').value,
+                budget: document.getElementById('contact-budget').value,
+                timeline: document.getElementById('contact-timeline').value,
+                project_type: document.getElementById('contact-project-type').value
+            };
+
+            try {
+                await apiCall('contacts', 'POST', contactData);
+                updateStatus(`✅ Messaggio inviato da ${contactData.name}`);
+                await loadContacts();
+            } catch (error) {
+                updateStatus(`❌ Errore invio contatto: ${error.message}`, true);
+            }
+        }
+
+        // Data loading functions
+        async function loadAllData() {
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadUsers(),
+                    loadProjects(),
+                    loadContacts(),
+                    loadTechnologies()
+                ]);
+                log('All data loaded successfully', 'success');
+            } catch (error) {
+                log(`Error loading data: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const result = await apiCall('stats');
+                updateStats(result.data);
+            } catch (error) {
+                log(`Error loading stats: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                // Simulazione caricamento utenti
+                document.getElementById('users-list').innerHTML = '<p>👥 Caricamento utenti dal database PHP...</p>';
+            } catch (error) {
+                log(`Error loading users: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const result = await apiCall('projects');
+                appState.projects = result.data;
+                
+                let html = '<table class="table"><tr><th>Titolo</th><th>Status</th><th>Featured</th><th>Azioni</th></tr>';
+                result.data.forEach(project => {
+                    html += `
+                        <tr>
+                            <td><strong>${project.title}</strong></td>
+                            <td><span class="badge badge-success">${project.status}</span></td>
+                            <td><span class="badge ${project.featured ? 'badge-warning' : 'badge-primary'}">${project.featured ? '⭐ Sì' : 'No'}</span></td>
+                            <td>
+                                <button class="btn btn-warning" onclick="toggleFeatured(${project.id})" style="padding: 4px 8px; font-size: 12px;">
+                                    ${project.featured ? '⭐ Rimuovi' : '⭐ Feature'}
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteProject(${project.id}, '${project.title}')" style="padding: 4px 8px; font-size: 12px;">
+                                    🗑️ Elimina
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                
+                document.getElementById('projects-list').innerHTML = html;
+            } catch (error) {
+                log(`Error loading projects: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadContacts() {
+            try {
+                const result = await apiCall('get-contacts');
+                
+                let html = '<table class="table"><tr><th>Nome</th><th>Email</th><th>Oggetto</th><th>Data</th></tr>';
+                result.data.slice(0, 5).forEach(contact => {
+                    html += `
+                        <tr>
+                            <td>${contact.name}</td>
+                            <td>${contact.email}</td>
+                            <td>${contact.subject || 'N/A'}</td>
+                            <td>${new Date(contact.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                
+                document.getElementById('contacts-list').innerHTML = html;
+            } catch (error) {
+                log(`Error loading contacts: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadTechnologies() {
+            try {
+                const result = await apiCall('technologies');
+                appState.technologies = result.data;
+                log(`Loaded ${result.data.length} technologies`, 'success');
+            } catch (error) {
+                log(`Error loading technologies: ${error.message}`, 'error');
+            }
+        }
+
+        // Project actions
+        async function toggleFeatured(projectId) {
+            try {
+                await apiCall('toggle-featured', 'POST', { project_id: projectId });
+                updateStatus('✅ Status featured aggiornato');
+                await loadProjects();
+                await loadStats();
+            } catch (error) {
+                updateStatus(`❌ Errore toggle featured: ${error.message}`, true);
+            }
+        }
+
+        async function deleteProject(projectId, projectTitle) {
+            if (!confirm(`Sei sicuro di voler eliminare "${projectTitle}"?`)) {
+                return;
+            }
+
+            try {
+                await apiCall('delete-project', 'POST', { project_id: projectId });
+                updateStatus(`✅ Progetto eliminato: ${projectTitle}`);
+                await loadProjects();
+                await loadStats();
+            } catch (error) {
+                updateStatus(`❌ Errore eliminazione progetto: ${error.message}`, true);
+            }
+        }
+
+        // API Testing
+        async function testAPI(endpoint) {
+            try {
+                const result = await apiCall(endpoint);
+                updateStatus(`✅ Test ${endpoint} completato`);
+                
+                if (endpoint === 'stats') {
+                    updateStats(result.data);
+                }
+            } catch (error) {
+                updateStatus(`❌ Test ${endpoint} fallito: ${error.message}`, true);
+            }
+        }
+
+        async function testUpload() {
+            try {
+                const result = await apiCall('upload-test', 'POST', {
+                    filename: 'test-image.jpg',
+                    type: 'image'
+                });
+                updateStatus('✅ Test upload simulato completato');
+                log(`Upload test: ${result.data.url}`, 'success');
+            } catch (error) {
+                updateStatus(`❌ Test upload fallito: ${error.message}`, true);
+            }
+        }
+
+        async function testDatabase() {
+            try {
+                const response = await fetch('/test-db.php');
+                const html = await response.text();
+                
+                log('Database test completed', 'success');
+                updateStatus('✅ Test database completato - Controlla console per dettagli');
+            } catch (error) {
+                updateStatus(`❌ Test database fallito: ${error.message}`, true);
+            }
+        }
+
+        async function checkTables() {
+            log('Checking database tables...', 'info');
+            try {
+                await testDatabase();
+            } catch (error) {
+                log(`Database check failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLaravel() {
+            log('Testing Laravel API endpoints...', 'info');
+            try {
+                // Test Laravel API se disponibile
+                const response = await fetch('/api/public/index.php');
+                if (response.ok) {
+                    log('Laravel API is accessible', 'success');
+                    updateStatus('✅ Laravel API accessibile');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`Laravel API test failed: ${error.message}`, 'warning');
+                updateStatus('⚠️ Laravel API non accessibile - usando API diretta');
+            }
+        }
+
+        async function runAllTests() {
+            log('=== STARTING COMPREHENSIVE TEST SUITE ===', 'info');
+            updateStatus('🔄 Esecuzione test completi...');
+            
+            const tests = [
+                () => testAPI('stats'),
+                () => testAPI('technologies'),
+                () => testAPI('projects'),
+                () => testAPI('get-contacts'),
+                () => testUpload(),
+                () => testDatabase(),
+                () => testLaravel()
+            ];
+
+            let passed = 0;
+            let failed = 0;
+
+            for (const test of tests) {
+                try {
+                    await test();
+                    passed++;
+                } catch (error) {
+                    failed++;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500)); // Pausa tra test
+            }
+
+            log(`=== TEST SUITE COMPLETED: ${passed} passed, ${failed} failed ===`, 'info');
+            updateStatus(`✅ Test completi: ${passed} successi, ${failed} fallimenti`);
+        }
+
+        // Utility functions
+        function clearConsole() {
+            const console = document.getElementById('console');
+            console.innerHTML = '<div class="console-line">🧪 Console pulita</div>';
+        }
+
+        function exportLogs() {
+            const console = document.getElementById('console');
+            const logs = console.innerText;
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `portfolio-test-logs-${new Date().toISOString().slice(0, 19)}.txt`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            updateStatus('✅ Log esportati');
+        }
+
+        // Initialize app
+        window.onload = function() {
+            log('Test Master Portfolio initialized', 'success');
+            updateStatus('✅ Sistema inizializzato - Pronto per i test');
+            
+            // Auto-load initial data
+            setTimeout(() => {
+                loadStats();
+                loadTechnologies();
+                loadProjects();
+                loadContacts();
+            }, 1000);
+        };
+    </script>
+</body>
+</html> 

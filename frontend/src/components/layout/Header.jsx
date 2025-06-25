@@ -115,6 +115,14 @@ const Header = ({ onToggleSidebar }) => {
                       <i className="fas fa-folder mr-3 text-blue-500"></i>
                       Gestione Progetti
                     </Link>
+                    <Link
+                      to="/admin/change-password"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                      onClick={() => setShowAdminDropdown(false)}
+                    >
+                      <i className="fas fa-key mr-3 text-orange-500"></i>
+                      Cambia Password
+                    </Link>
                     
                     <div className="border-t border-gray-200 dark:border-slate-700 my-1"></div>
                     

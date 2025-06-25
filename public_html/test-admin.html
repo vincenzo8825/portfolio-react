@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Admin Portfolio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
+        .section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.07); }
+        .section h3 { color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #495057; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
+        .btn { padding: 12px 24px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; margin-right: 10px; }
+        .btn:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #229954; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .console { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 13px; height: 200px; overflow-y: auto; margin-top: 15px; }
+        .status { padding: 15px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; }
+        .status.success { background: #d4f6d4; color: #155724; border: 1px solid #c3e6c3; }
+        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f1aeb5; }
+        .status.info { background: #cce7ff; color: #004085; border: 1px solid #99d1ff; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table th, .table td { padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .table th { background: #f8f9fa; font-weight: 600; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: #d1f2eb; color: #00875a; }
+        .badge-danger { background: #ffe6e6; color: #de3e3e; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Admin Portfolio - Vincenzo Rocca</h1>
+            <p>Pannello di test completo per tutte le funzionalità del sito</p>
+        </div>
+
+        <div id="status-area"></div>
+
+        <div class="grid">
+            <!-- Login Section -->
+            <div class="section">
+                <h3>🔐 Login</h3>
+                <div id="login-form">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="login-email" value="vincenzorocca88@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="login-password" value="admin123">
+                    </div>
+                    <button class="btn" onclick="testLogin()">🔓 Login</button>
+                </div>
+                <div id="login-success" class="hidden">
+                    <p>✅ Loggato come: <span id="user-name"></span></p>
+                    <button class="btn btn-danger" onclick="logout()">🔒 Logout</button>
+                </div>
+            </div>
+
+            <!-- Password Change -->
+            <div class="section">
+                <h3>🔑 Cambio Password</h3>
+                <div class="form-group">
+                    <label>Password Attuale:</label>
+                    <input type="password" id="current-password">
+                </div>
+                <div class="form-group">
+                    <label>Nuova Password:</label>
+                    <input type="password" id="new-password">
+                </div>
+                <button class="btn btn-success" onclick="changePassword()">🔄 Cambia Password</button>
+            </div>
+
+            <!-- Database Test -->
+            <div class="section">
+                <h3>🗄️ Test Database</h3>
+                <button class="btn" onclick="testDatabase()">🔍 Test Connessione DB</button>
+                <button class="btn" onclick="loadTechnologies()">⚡ Carica Tecnologie</button>
+                <button class="btn" onclick="loadProjects()">🚀 Carica Progetti</button>
+                <button class="btn" onclick="getStats()">📊 Statistiche</button>
+                <div id="db-results"></div>
+            </div>
+        </div>
+
+        <!-- Create User -->
+        <div class="section">
+            <h3>👤 Crea Nuovo Utente</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" id="user-name-input" placeholder="Nome Cognome">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="user-email-input" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="user-password-input" placeholder="Password123">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="user-admin-input"> 
+                            È Amministratore
+                        </label>
+                    </div>
+                    <button class="btn btn-success" onclick="createUser()">➕ Crea Utente</button>
+                </div>
+                <div id="users-list"></div>
+            </div>
+        </div>
+
+        <!-- Create Project -->
+        <div class="section">
+            <h3>🚀 Gestione Progetti</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Titolo Progetto:</label>
+                        <input type="text" id="project-title" placeholder="Il Mio Progetto">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrizione:</label>
+                        <textarea id="project-description" placeholder="Descrizione del progetto..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>URL Demo:</label>
+                        <input type="url" id="project-demo" placeholder="https://demo.example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>URL GitHub:</label>
+                        <input type="url" id="project-github" placeholder="https://github.com/user/repo">
+                    </div>
+                    <div class="form-group">
+                        <label>Tecnologie (separate da virgola):</label>
+                        <input type="text" id="project-tech" placeholder="React, Laravel, MySQL">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="project-featured"> 
+                            In Evidenza
+                        </label>
+                    </div>
+                    <button class="btn btn-success" onclick="createProject()">🚀 Crea Progetto</button>
+                </div>
+                <div id="projects-list"></div>
+            </div>
+        </div>
+
+        <!-- Contact Form Test -->
+        <div class="section">
+            <h3>📧 Test Form Contatti</h3>
+            <div class="grid">
+                <div>
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" id="contact-name" value="Test User">
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="contact-email" value="test@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Oggetto:</label>
+                        <input type="text" id="contact-subject" value="Test contatto dal sito">
+                    </div>
+                    <div class="form-group">
+                        <label>Messaggio:</label>
+                        <textarea id="contact-message">Questo è un messaggio di test per verificare il funzionamento del form contatti.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget:</label>
+                        <select id="contact-budget">
+                            <option value="">Seleziona...</option>
+                            <option value="< 1000€">< 1000€</option>
+                            <option value="1000€ - 5000€">1000€ - 5000€</option>
+                            <option value="5000€ - 10000€">5000€ - 10000€</option>
+                            <option value="> 10000€">> 10000€</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="sendContact()">📧 Invia Test</button>
+                </div>
+                <div id="contacts-list"></div>
+            </div>
+        </div>
+
+        <!-- Console -->
+        <div class="section">
+            <h3>🖥️ Console Debug</h3>
+            <button class="btn" onclick="clearConsole()">🗑️ Pulisci Console</button>
+            <button class="btn" onclick="testAllAPIs()">🔄 Test Tutti API</button>
+            <div id="console" class="console">
+                Console inizializzata...<br>
+                📍 API Base URL: /api-direct.php<br>
+                📍 Test DB URL: /test-db.php<br>
+                ⏰ <?= date('Y-m-d H:i:s') ?><br>
+                <hr>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoggedIn = false;
+        let authToken = '';
+        let currentUser = null;
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const emoji = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            console.innerHTML += `${emoji} [${timestamp}] ${message}<br>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusArea = document.getElementById('status-area');
+            statusArea.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => statusArea.innerHTML = '', 5000);
+        }
+
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`/api-direct.php?endpoint=${endpoint}`, options);
+                const result = await response.json();
+                
+                log(`API ${method} ${endpoint}: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'API Error');
+                }
+                
+                return result;
+            } catch (error) {
+                log(`API Error ${endpoint}: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const result = await apiCall('login', 'POST', { email, password });
+                
+                if (result.success) {
+                    isLoggedIn = true;
+                    authToken = result.token;
+                    currentUser = result.user;
+                    
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('login-success').classList.remove('hidden');
+                    document.getElementById('user-name').textContent = currentUser.name;
+                    
+                    showStatus(`✅ Login effettuato come ${currentUser.name}`, 'success');
+                    log(`Login success: ${currentUser.name} (${currentUser.email})`, 'success');
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                showStatus(`❌ Errore login: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            authToken = '';
+            currentUser = null;
+            
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('login-success').classList.add('hidden');
+            
+            showStatus('✅ Logout effettuato', 'success');
+            log('Logout completed', 'success');
+        }
+
+        async function testDatabase() {
+            try {
+                const response = await fetch('/test-db.php');
+                const html = await response.text();
+                
+                document.getElementById('db-results').innerHTML = html;
+                log('Database test completed', 'success');
+                showStatus('✅ Test database completato', 'success');
+            } catch (error) {
+                log(`Database test error: ${error.message}`, 'error');
+                showStatus(`❌ Errore test database: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadTechnologies() {
+            try {
+                const result = await apiCall('technologies');
+                const techs = result.data;
+                
+                log(`Loaded ${techs.length} technologies`, 'success');
+                showStatus(`✅ Caricate ${techs.length} tecnologie`, 'success');
+                
+                // Display first 10 technologies
+                let html = '<h4>Tecnologie (prime 10):</h4><ul>';
+                techs.slice(0, 10).forEach(tech => {
+                    html += `<li>${tech.name} (${tech.category})</li>`;
+                });
+                html += '</ul>';
+                
+                document.getElementById('db-results').innerHTML = html;
+            } catch (error) {
+                showStatus(`❌ Errore caricamento tecnologie: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const result = await apiCall('projects');
+                const projects = result.data;
+                
+                log(`Loaded ${projects.length} projects`, 'success');
+                showStatus(`✅ Caricati ${projects.length} progetti`, 'success');
+                
+                let html = '<h4>Progetti:</h4>';
+                if (projects.length > 0) {
+                    html += '<table class="table"><tr><th>Titolo</th><th>Status</th><th>Creato</th></tr>';
+                    projects.forEach(project => {
+                        html += `<tr><td>${project.title}</td><td><span class="badge badge-success">${project.status}</span></td><td>${new Date(project.created_at).toLocaleDateString()}</td></tr>`;
+                    });
+                    html += '</table>';
+                } else {
+                    html += '<p>Nessun progetto trovato</p>';
+                }
+                
+                document.getElementById('projects-list').innerHTML = html;
+            } catch (error) {
+                showStatus(`❌ Errore caricamento progetti: ${error.message}`, 'error');
+            }
+        }
+
+        async function getStats() {
+            try {
+                const result = await apiCall('stats');
+                const stats = result.data;
+                
+                let html = '<h4>📊 Statistiche Database:</h4>';
+                html += `<p>👥 Utenti: <strong>${stats.users}</strong></p>`;
+                html += `<p>🚀 Progetti: <strong>${stats.projects}</strong></p>`;
+                html += `<p>📧 Contatti: <strong>${stats.contacts}</strong></p>`;
+                html += `<p>⚡ Tecnologie: <strong>${stats.technologies}</strong></p>`;
+                
+                document.getElementById('db-results').innerHTML = html;
+                log('Statistics loaded successfully', 'success');
+                showStatus('✅ Statistiche caricate', 'success');
+            } catch (error) {
+                showStatus(`❌ Errore caricamento statistiche: ${error.message}`, 'error');
+            }
+        }
+
+        async function sendContact() {
+            const contactData = {
+                name: document.getElementById('contact-name').value,
+                email: document.getElementById('contact-email').value,
+                subject: document.getElementById('contact-subject').value,
+                message: document.getElementById('contact-message').value,
+                budget: document.getElementById('contact-budget').value,
+                timeline: '',
+                project_type: 'Test'
+            };
+
+            try {
+                const result = await apiCall('contacts', 'POST', contactData);
+                showStatus('✅ Messaggio di contatto inviato con successo', 'success');
+                log('Contact message sent successfully', 'success');
+            } catch (error) {
+                showStatus(`❌ Errore invio contatto: ${error.message}`, 'error');
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = 'Console pulita...<br>';
+        }
+
+        async function testAllAPIs() {
+            log('=== INIZIO TEST COMPLETO API ===', 'info');
+            
+            try {
+                await getStats();
+                await loadTechnologies();
+                await loadProjects();
+                
+                log('=== TEST COMPLETATO CON SUCCESSO ===', 'success');
+                showStatus('✅ Tutti i test API completati con successo', 'success');
+            } catch (error) {
+                log('=== TEST FALLITO ===', 'error');
+                showStatus(`❌ Test API fallito: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run initial tests
+        window.onload = function() {
+            log('Pagina caricata - Sistema pronto per i test', 'success');
+            setTimeout(() => {
+                testDatabase();
+                getStats();
+            }, 1000);
+        };
+    </script>
+</body>
+</html> 

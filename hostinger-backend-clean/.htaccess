@@ -1,0 +1,11 @@
+# Configurazione per vincenzorocca.com
+
+# Opzione 1: Redirect a Vercel (decommenta se vuoi il redirect)
+# RewriteEngine On
+# RewriteRule ^$ https://your-vercel-domain.vercel.app [R=301,L]
+
+# Opzione 2: Mostra pagina info (default)
+DirectoryIndex info.html index.html
+
+# Sicurezza
+Options -Indexes

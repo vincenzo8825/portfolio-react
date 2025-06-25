@@ -134,7 +134,7 @@ const Dashboard = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             {t('quickActions')}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
               to="/admin/projects/create"
               className="flex items-center p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors"
@@ -154,6 +154,17 @@ const Dashboard = () => {
               <div>
                 <p className="font-medium text-green-700 dark:text-green-300">{t('projectManagement')}</p>
                 <p className="text-sm text-green-600 dark:text-green-400">{t('manageProjects')}</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/change-password"
+              className="flex items-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+            >
+              <i className="fas fa-key text-orange-600 dark:text-orange-400 text-xl mr-3"></i>
+              <div>
+                <p className="font-medium text-orange-700 dark:text-orange-300">Cambia Password</p>
+                <p className="text-sm text-orange-600 dark:text-orange-400">Aggiorna credenziali</p>
               </div>
             </Link>
 
