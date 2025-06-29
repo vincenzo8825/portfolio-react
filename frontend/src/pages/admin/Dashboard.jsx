@@ -32,23 +32,25 @@ const Dashboard = () => {
       
       // Carica progetti
       const projects = await projectsService.getAll()
-      const featuredCount = projects.filter(p => p.featured).length
-      const completedCount = projects.filter(p => p.status === 'completed').length
+      const featured = projects.filter(p => p.is_featured || p.featured)
+      const completed = projects.filter(p => p.status === 'completed' || !p.status)
+      
+      const stats = {
+        totalProjects: projects.length,
+        featuredProjects: featured.length,
+        completedProjects: completed.length
+      }
+      
+      console.log('Dashboard stats updated:', {
+        totalProjects: projects.length
+      })
       
       // Progetti recenti (ultimi 5)
       const sortedProjects = projects
         .sort((a, b) => new Date(b.created_at || b.project_date) - new Date(a.created_at || a.project_date))
         .slice(0, 5)
 
-      setStats({
-        totalProjects: projects.length,
-        featuredProjects: featuredCount,
-        completedProjects: completedCount
-      })
-      
-      console.log('Dashboard stats updated:', {
-        totalProjects: projects.length
-      })
+      setStats(stats)
       
       setRecentProjects(sortedProjects)
       

@@ -19,8 +19,8 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string'
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|min:6|max:255'
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -121,8 +121,8 @@ class AuthController extends Controller
     public function changePassword(Request $request): JsonResponse
     {
         $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed'
+            'current_password' => 'required|string|max:255',
+            'new_password' => 'required|string|min:8|max:255|confirmed|different:current_password'
         ]);
 
         $user = $request->user();

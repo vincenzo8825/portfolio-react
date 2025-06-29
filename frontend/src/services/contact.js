@@ -1,16 +1,11 @@
 import { apiService } from './api'
 import { API_ENDPOINTS } from '../utils/constants'
+import { contactServiceOverride } from './api-config'
 
 export const contactService = {
-  // Send contact message (public)
+  // Send contact message (public) - ora usa l'API diretta
   async sendMessage(contactData) {
-    const response = await apiService.post(API_ENDPOINTS.CONTACTS, contactData)
-    
-    if (response.data.success) {
-      return response.data
-    } else {
-      throw new Error(response.data.message || 'Failed to send message')
-    }
+    return await contactServiceOverride.sendMessage(contactData)
   },
 
   // Get all contact messages (admin only)

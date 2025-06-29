@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true)
         } catch (error) {
           // Token invalid or expired
-          console.error('Auth init error:', error)
           localStorage.removeItem('auth-token')
           setToken(null)
           setUser(null)
@@ -48,6 +47,10 @@ export const AuthProvider = ({ children }) => {
       if (response.success && response.data) {
         const { user: userData, token: authToken } = response.data
         
+        // Store token in localStorage first
+        localStorage.setItem('auth-token', authToken)
+        
+        // Then update state
         setUser(userData)
         setToken(authToken)
         setIsAuthenticated(true)
@@ -60,26 +63,21 @@ export const AuthProvider = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Login error in context:', error)
-      
-      // Handle different error types
-      let errorMessage = 'Errore durante il login'
+      let message = 'Errore durante il login'
       
       if (error.response?.status === 422) {
         // Validation error - credentials wrong
-        errorMessage = 'Credenziali non valide. Verifica email e password.'
+        message = 'Credenziali non valide. Verifica email e password.'
       } else if (error.response?.status === 403) {
         // Forbidden - not admin
-        errorMessage = 'Accesso negato. Solo gli amministratori possono accedere.'
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
+        message = 'Accesso negato. Non hai i permessi necessari.'
       } else if (error.message) {
-        errorMessage = error.message
+        message = error.message
       }
       
       return { 
         success: false, 
-        message: errorMessage
+        message: message
       }
     } finally {
       setIsLoading(false)
@@ -90,8 +88,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout()
     } catch (error) {
-      // Ignore logout errors
-      console.error('Logout error:', error)
+      // Handle logout error silently
     } finally {
       setUser(null)
       setToken(null)

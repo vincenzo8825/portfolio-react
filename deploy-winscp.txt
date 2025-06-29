@@ -1,0 +1,45 @@
+# WinSCP Script per Deploy Contact Form Fix
+# Copia questo contenuto in WinSCP > Commands > Generate Code
+
+# Connessione con credenziali corrette
+open ftp://u336414084.vincenzo88:Dorelan5.2@ftp.vincenzorocca.com
+
+# Naviga alla directory corretta
+cd /home/u336414084/domains/vincenzorocca.com/public_html
+
+# Upload API principale
+put "public_html\api\index.php" "/home/u336414084/domains/vincenzorocca.com/public_html/api/"
+
+# Upload file di test
+put "public_html\test-contact-form.php" "/home/u336414084/domains/vincenzorocca.com/public_html/"
+put "public_html\update-contacts-table.php" "/home/u336414084/domains/vincenzorocca.com/public_html/"
+put "public_html\CONTACT-FORM-FIXED.md" "/home/u336414084/domains/vincenzorocca.com/public_html/"
+
+# Upload frontend assets aggiornati
+put "public_html\assets\index-BKLvCjHe.js" "/home/u336414084/domains/vincenzorocca.com/public_html/assets/"
+put "public_html\assets\index-CoZPpuo8.css" "/home/u336414084/domains/vincenzorocca.com/public_html/assets/"
+put "public_html\assets\router-qtbhp7Me.js" "/home/u336414084/domains/vincenzorocca.com/public_html/assets/"
+put "public_html\assets\ui-KUd19APl.js" "/home/u336414084/domains/vincenzorocca.com/public_html/assets/"
+put "public_html\assets\vendor-dQk0gtQ5.js" "/home/u336414084/domains/vincenzorocca.com/public_html/assets/"
+
+# Upload index.html aggiornato
+put "public_html\index.html" "/home/u336414084/domains/vincenzorocca.com/public_html/"
+
+# Chiudi connessione
+close
+
+# Exit
+exit
+
+# ISTRUZIONI:
+# 1. Apri WinSCP
+# 2. Vai su Commands > Generate Code
+# 3. Incolla questo script
+# 4. Esegui il deploy
+
+# OPPURE CONNESSIONE MANUALE:
+# Protocol: FTP
+# Host: ftp.vincenzorocca.com
+# Username: u336414084.vincenzo88
+# Password: Dorelan5.2
+# Directory: /home/u336414084/domains/vincenzorocca.com/public_html 

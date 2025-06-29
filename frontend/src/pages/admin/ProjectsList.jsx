@@ -8,6 +8,7 @@ const ProjectsList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState({})
+  const [message, setMessage] = useState(null)
 
   const { showSuccess, showError } = useNotification()
 
@@ -19,11 +20,9 @@ const ProjectsList = () => {
   const loadProjects = async () => {
     try {
       setLoading(true)
-      setError(null)
       const data = await projectsService.getAll()
       setProjects(data)
     } catch (err) {
-      console.error('Error loading projects:', err)
       setError('Errore nel caricamento dei progetti')
     } finally {
       setLoading(false)
@@ -31,43 +30,40 @@ const ProjectsList = () => {
   }
 
   // Elimina progetto
-  const handleDelete = async (projectId, projectTitle) => {
-    if (!confirm(`Sei sicuro di voler eliminare "${projectTitle}"?`)) {
+  const handleDelete = async (id, title) => {
+    if (!window.confirm(`Sei sicuro di voler eliminare "${title}"?`)) {
       return
     }
 
+    setDeleteLoading(prev => ({ ...prev, [id]: true }))
+    
     try {
-      setDeleteLoading(prev => ({ ...prev, [projectId]: true }))
-      await projectsService.delete(projectId)
-      setProjects(prev => prev.filter(p => p.id !== projectId))
-      showSuccess('Progetto eliminato con successo')
+      await projectsService.delete(id)
+      await loadProjects()
+      setMessage('Progetto eliminato con successo')
     } catch (err) {
-      console.error('Error deleting project:', err)
-      showError('Errore nell\'eliminazione del progetto')
+      setError('Errore nell\'eliminazione del progetto')
     } finally {
-      setDeleteLoading(prev => ({ ...prev, [projectId]: false }))
+      setDeleteLoading(prev => ({ ...prev, [id]: false }))
     }
   }
 
   // Toggle featured
-  const toggleFeatured = async (projectId) => {
+  const handleToggleFeatured = async (id) => {
+    setDeleteLoading(prev => ({ ...prev, [id]: true }))
+    
     try {
-      const updatedProject = await projectsService.toggleFeatured(projectId)
-      
-      setProjects(prev => prev.map(p => 
-        p.id === projectId ? { ...p, featured: updatedProject.featured } : p
-      ))
-      
-      showSuccess(`Progetto ${updatedProject.featured ? 'aggiunto ai' : 'rimosso dai'} progetti in evidenza`)
+      await projectsService.toggleFeatured(id)
+      await loadProjects()
+      setMessage('Stato "in evidenza" aggiornato con successo')
     } catch (err) {
-      console.error('Error toggling featured:', err)
-      
-      // Gestisci errore specifico per limite di 3 progetti featured
       if (err.message && err.message.includes('Massimo 3 progetti')) {
-        showError('Massimo 3 progetti possono essere in evidenza. Rimuovi prima un altro progetto.')
+        setError('Massimo 3 progetti possono essere in evidenza. Rimuovi prima un altro progetto.')
       } else {
-        showError('Errore nell\'aggiornamento del progetto')
+        setError('Errore nell\'aggiornamento dello stato "in evidenza"')
       }
+    } finally {
+      setDeleteLoading(prev => ({ ...prev, [id]: false }))
     }
   }
 
@@ -206,7 +202,7 @@ const ProjectsList = () => {
                   {/* Technologies */}
                   {project.technologies && project.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {project.technologies.slice(0, 3).map((tech, index) => (
+                      {(project.technologies || []).slice(0, 3).map((tech, index) => (
                         <span 
                           key={index}
                           className="px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded text-xs font-medium"
@@ -227,7 +223,7 @@ const ProjectsList = () => {
                     <div className="flex items-center space-x-2">
                       {/* Featured Toggle */}
                       <button
-                        onClick={() => toggleFeatured(project.id)}
+                        onClick={() => handleToggleFeatured(project.id)}
                         className={`p-2 rounded-lg transition-colors ${
                           project.featured 
                             ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400'

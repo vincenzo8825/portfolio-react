@@ -20,16 +20,23 @@ return [
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => [
+        // Development
         'http://localhost:3000',
         'http://localhost:5173',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5173',
-        // Produzione - Hostinger domains
-        'https://*.hostinger.com',
-        'https://*.000webhostapp.com',
+
+        // Production domains - Solo Hostinger
+        'https://vincenzorocca.com',
+        'https://www.vincenzorocca.com',
     ],
 
     'allowed_origins_patterns' => [
+        // Vercel patterns
+        '#^https://[a-z0-9\-]+\.vercel\.app$#',
+        '#^https://[a-z0-9\-]+-[a-z0-9\-]+\.vercel\.app$#',
+
+        // Hostinger patterns
         '#^https://[a-z0-9\-]+\.hostinger\.com$#',
         '#^https://[a-z0-9\-]+\.000webhostapp\.com$#',
     ],

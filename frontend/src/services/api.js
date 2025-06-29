@@ -1,7 +1,18 @@
 import axios from 'axios'
 
-// Base API configuration - Updated for Laravel backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://vincenzorocca.com/api/v1'
+// API configuration with fallbacks
+const getApiBaseUrl = () => {
+  // Priority: ENV variable > global variable > fallback
+  return import.meta.env.VITE_API_BASE_URL || 
+         (typeof window !== 'undefined' && window.__API_BASE_URL__) ||
+         'https://vincenzorocca.com/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('🔧 API configurata per:', API_BASE_URL);
+console.log('🔍 Environment:', import.meta.env.MODE);
+console.log('🔧 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +20,8 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: false // Laravel Sanctum with SPA doesn't need cookies
+  withCredentials: false,
+  timeout: 10000 // 10 secondi timeout
 })
 
 // Request interceptor to add auth token
@@ -27,7 +39,9 @@ api.interceptors.request.use(
             localStorage.removeItem('auth-token')
             localStorage.removeItem('auth-token-data')
             localStorage.removeItem('user-data')
-            window.location.href = '/login'
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login'
+            }
             return Promise.reject(new Error('Token expired'))
           }
         } catch (error) {
@@ -47,6 +61,11 @@ api.interceptors.request.use(
     // Aggiungi header di sicurezza
     config.headers['X-Requested-With'] = 'XMLHttpRequest'
     
+    // Debug solo in development
+    if (import.meta.env.VITE_DEBUG_API === 'true') {
+      console.log('📡 API Request:', config.method?.toUpperCase(), config.url, config.data)
+    }
+    
     return config
   },
   (error) => {
@@ -57,15 +76,24 @@ api.interceptors.request.use(
 // Response interceptor to handle common errors
 api.interceptors.response.use(
   (response) => {
+    // Debug solo in development
+    if (import.meta.env.VITE_DEBUG_API === 'true') {
+      console.log('📬 API Response:', response.status, response.config.url)
+    }
     return response
   },
   (error) => {
+    // Log errori sempre
+    console.error('❌ API Error:', error.response?.status, error.response?.config?.url, error.message)
+    
     if (error.response?.status === 401) {
       // Unauthorized - token expired or invalid
       localStorage.removeItem('auth-token')
       localStorage.removeItem('auth-token-data')
       localStorage.removeItem('user-data')
-      window.location.href = '/login'
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
     } else if (error.response?.status === 403) {
       // Forbidden
       console.error('Access forbidden:', error.response?.data?.message || 'Insufficient permissions')
@@ -93,76 +121,9 @@ export const apiService = {
   delete: (url, config = {}) => api.delete(url, config)
 }
 
-// File upload methods
-export const uploadService = {
-  // Upload single image
-  async uploadImage(imageFile) {
-    const formData = new FormData()
-    formData.append('image', imageFile)
-    
-    const response = await apiService.post('/admin/upload/image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    
-    if (response.data.success) {
-      return response.data.data
-    } else {
-      throw new Error(response.data.message || 'Failed to upload image')
-    }
-  },
+// Upload service for file uploads - USING HOTFIX OVERRIDE
+import { uploadServiceOverride } from './api-config'
 
-  // Upload video
-  async uploadVideo(videoFile) {
-    const formData = new FormData()
-    formData.append('video', videoFile)
-    
-    const response = await apiService.post('/admin/upload/video', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    
-    if (response.data.success) {
-      return response.data.data
-    } else {
-      throw new Error(response.data.message || 'Failed to upload video')
-    }
-  },
+export const uploadService = uploadServiceOverride
 
-  // Upload multiple images for gallery
-  async uploadGallery(imageFiles) {
-    const formData = new FormData()
-    imageFiles.forEach((file, index) => {
-      formData.append(`images[${index}]`, file)
-    })
-    
-    const response = await apiService.post('/admin/upload/gallery', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    
-    if (response.data.success) {
-      return response.data.data
-    } else {
-      throw new Error(response.data.message || 'Failed to upload gallery')
-    }
-  },
-
-  // Delete file
-  async deleteFile(filePath) {
-    const response = await apiService.delete('/admin/upload/file', {
-      data: { path: filePath }
-    })
-    
-    if (response.data.success) {
-      return response.data
-    } else {
-      throw new Error(response.data.message || 'Failed to delete file')
-    }
-  }
-}
-
-export default api 
+export default api

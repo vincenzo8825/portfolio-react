@@ -44,7 +44,7 @@ const FileUpload = ({
       onUploadSuccess?.(result)
       
     } catch (error) {
-      console.error('Upload error:', error)
+      console.error('Upload error:', error);
       showError(error.message || 'Errore durante il caricamento')
       onUploadError?.(error)
     } finally {

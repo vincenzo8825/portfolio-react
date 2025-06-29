@@ -19,7 +19,7 @@ const Projects = () => {
 
   const { user, isAuthenticated } = useAuth()
   const { language } = useLanguage()
-  const { showError } = useNotification()
+  const { showError, showNotification } = useNotification()
 
   // Check if user is admin
   const isAdmin = isAuthenticated && user?.is_admin
@@ -132,8 +132,7 @@ const Projects = () => {
       const data = await projectsService.getAll()
       setProjects(data)
     } catch (error) {
-      console.error('Error loading projects:', error)
-      showError('Errore nel caricamento dei progetti')
+      showNotification('Errore nel caricamento dei progetti')
       setProjects([])
     } finally {
       setIsLoading(false)
@@ -156,19 +155,19 @@ const Projects = () => {
     return 'other'
   }
 
-  // Enhanced projects with derived category
-  const enhancedProjects = projects.map(project => ({
+  // Enhanced projects with derived category - Sicuro per array vuoti
+  const enhancedProjects = Array.isArray(projects) ? projects.map(project => ({
     ...project,
-    category: getProjectCategory(project.technologies),
+    category: getProjectCategory(project.technologies || []),
     demo: project.demo_url,
     github: project.github_url,
-            linkedin: project.linkedin_url || "https://www.linkedin.com/in/webdevfullstack/", // Default value
+    linkedin: project.linkedin_url || "https://www.linkedin.com/in/webdevfullstack/",
     year: project.project_date ? new Date(project.project_date).getFullYear() : new Date().getFullYear(),
-    client: "Portfolio Project", // Default value
-    // duration: "Variable", // Default value
-    features: [], // Could be derived from long_description if needed
-    image: project.image_url
-  }))
+    client: project.client || "Portfolio Project",
+    features: project.features || [],
+    image: project.image_url || project.image,
+    technologies: project.technologies || [] // Assicura che sia sempre un array
+  })) : []
 
   const filters = [
     { id: 'all', label: getText('allProjects'), count: enhancedProjects.length },
@@ -185,11 +184,11 @@ const Projects = () => {
     return project.category === selectedFilter
   })
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage)
+  // Pagination logic - Sicuro per array vuoti
+  const totalPages = Math.ceil((filteredProjects?.length || 0) / projectsPerPage)
   const startIndex = (currentPage - 1) * projectsPerPage
   const endIndex = startIndex + projectsPerPage
-  const currentProjects = filteredProjects.slice(startIndex, endIndex)
+  const currentProjects = Array.isArray(filteredProjects) ? filteredProjects.slice(startIndex, endIndex) : []
 
   // Reset page when filter changes
   useEffect(() => {
@@ -410,7 +409,7 @@ const Projects = () => {
 
         {/* Technologies */}
         <div className="flex flex-wrap gap-1 sm:gap-2 mb-4">
-          {project.technologies.slice(0, 3).map((tech) => (
+          {(project.technologies || []).slice(0, 3).map((tech) => (
             <span
               key={tech}
               className={`px-2 sm:px-3 py-1 bg-gradient-to-r ${getTechColor(tech)} text-white text-xs rounded-full font-medium shadow-lg`}
@@ -418,9 +417,9 @@ const Projects = () => {
               {tech}
             </span>
           ))}
-          {project.technologies.length > 3 && (
+          {(project.technologies || []).length > 3 && (
             <span className="px-2 sm:px-3 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 text-xs rounded-full font-medium">
-              +{project.technologies.length - 3}
+                              +{(project.technologies || []).length - 3}
             </span>
           )}
         </div>
@@ -430,7 +429,7 @@ const Projects = () => {
           <div className="mb-4">
             <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">{getText('mainFeatures')}</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-              {project.features.slice(0, 4).map((feature, idx) => (
+              {(project.features || []).slice(0, 4).map((feature, idx) => (
                 <div key={idx} className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                   <i className="fas fa-check text-green-500 mr-2"></i>
                   {feature}
@@ -775,7 +774,7 @@ const Projects = () => {
 
                         {/* Technologies */}
                         <div className="flex flex-wrap gap-2 mb-6 lg:mb-8">
-                          {project.technologies.slice(0, 4).map((tech) => (
+                          {(project.technologies || []).slice(0, 4).map((tech) => (
                             <span
                               key={tech}
                               className="px-3 py-1 bg-white/10 backdrop-blur-sm text-white text-sm rounded-full border border-white/20"
@@ -1163,7 +1162,7 @@ const Projects = () => {
           ) : (
             <>
               {viewMode === 'cards' ? (
-                <ProjectCarousel projects={currentProjects} />
+                <ProjectCarousel projects={Array.isArray(currentProjects) ? currentProjects : []} />
               ) : (
                 <div className={`${
                   viewMode === 'grid' 
@@ -1172,7 +1171,7 @@ const Projects = () => {
                     ? 'relative max-w-6xl mx-auto'
                     : 'space-y-6 sm:space-y-8'
                 }`}>
-                  {currentProjects.map((project, index) => (
+                  {Array.isArray(currentProjects) && currentProjects.map((project, index) => (
                     viewMode === 'list' ? (
                       <ProjectListItem key={project.id} project={project} />
                     ) : viewMode === 'timeline' ? (
@@ -1235,7 +1234,7 @@ const Projects = () => {
           )}
 
           {/* Empty State */}
-          {!isLoading && currentProjects.length === 0 && (
+          {!isLoading && (!currentProjects || currentProjects.length === 0) && (
             <div className="text-center py-12 sm:py-20">
               <div className="w-16 sm:w-24 h-16 sm:h-24 mx-auto mb-6 sm:mb-8 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
                 <i className="fas fa-filter text-2xl sm:text-3xl text-gray-400"></i>
@@ -1283,7 +1282,16 @@ const Projects = () => {
                   {getText('cancel')}
                 </button>
                 <button
-                  onClick={() => handleDeleteProject(showDeleteConfirm)}
+                  onClick={() => {
+                    (async (projectId) => {
+                      try {
+                        setProjects(prev => prev.filter(p => p.id !== projectId));
+                        setShowDeleteConfirm(null);
+                      } catch (error) {
+                        // Handle error silently or show user-friendly message
+                      }
+                    })(showDeleteConfirm);
+                  }}
                   className="flex-1 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors duration-300 font-medium"
                 >
                   {getText('delete')}

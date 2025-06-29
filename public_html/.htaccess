@@ -1,36 +1,28 @@
+# Portfolio React SPA - Hostinger Configuration
 RewriteEngine On
 
-# Security headers
-Header always set X-Frame-Options "SAMEORIGIN"
-Header always set X-Content-Type-Options "nosniff"
-Header always set Referrer-Policy "strict-origin-when-cross-origin"
+# Handle Angular and React Router
+RewriteBase /
 
-# CORS for API requests
-Header always set Access-Control-Allow-Origin "*"
-Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+# Handle CORS per API
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "https://vincenzorocca.com"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept"
+    Header always set Access-Control-Allow-Credentials "true"
+</IfModule>
 
-# Handle preflight requests
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ - [R=200,L]
+# Redirect delle API al backend Laravel
+RewriteRule ^api/(.*)$ api/public/index.php [QSA,L]
 
-# Direct API endpoints - allow direct access
-RewriteRule ^api/v1/(.*)$ - [L]
-
-# API redirect to Laravel backend (for other API routes)
-RewriteRule ^api/(.*)$ /api/public/index.php [QSA,L]
-
-# Test files and debug endpoints - allow direct access
-RewriteRule ^(test-.*\.php|info\.php|debug\.php|api-proxy\.php|api-direct\.php)$ - [L]
-
-# React Router - handle client-side routing
+# React Router - tutte le rotte al index.html (escludi file PHP)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
-RewriteCond %{REQUEST_URI} !^/test-
+RewriteCond %{REQUEST_URI} !\.php$
 RewriteRule . /index.html [L]
 
-# Cache static assets
+# Cache statico per performance
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresByType text/css "access plus 1 year"
@@ -42,7 +34,40 @@ RewriteRule . /index.html [L]
     ExpiresByType image/svg+xml "access plus 1 year"
 </IfModule>
 
-# Compression
+# Compressione GZIP
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
-</IfModule> 
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Sicurezza
+<Files "*.env*">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+# CORS Headers for API
+<LocationMatch "^/api/">
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With"
+    Header always set Access-Control-Max-Age "3600"
+</LocationMatch>
+
+# Handle preflight OPTIONS requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^api/(.*)$ api/public/index.php [L,QSA]

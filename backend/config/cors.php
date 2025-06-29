@@ -26,14 +26,9 @@ return [
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5173',
 
-        // Vercel deployment (aggiungi qui il tuo dominio Vercel)
-        'https://*.vercel.app',
-        'https://your-portfolio.vercel.app', // Sostituisci con il tuo dominio
-
-        // Hostinger domains (per backup)
-        'https://*.hostinger.com',
-        'https://*.000webhostapp.com',
+        // Production domains - Solo Hostinger
         'https://vincenzorocca.com',
+        'https://www.vincenzorocca.com',
     ],
 
     'allowed_origins_patterns' => [

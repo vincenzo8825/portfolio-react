@@ -17,11 +17,11 @@ export const useProjects = (initialParams = {}) => {
 
   const fetchProjects = useCallback(async () => {
     const { data } = await executeRequest(() => 
-      projectsService.getProjects(filters)
+      projectsService.getAll(filters)
     )
     
     if (data) {
-      setProjects(data.data || [])
+      setProjects(Array.isArray(data) ? data : data.data || [])
       setMeta(data.meta || null)
     }
   }, [executeRequest, filters])

@@ -41,17 +41,66 @@ const Contact = () => {
     })
   }
 
+  const validateForm = () => {
+    const errors = []
+    
+    // Nome obbligatorio
+    if (!formData.name.trim()) {
+      errors.push('Il nome è obbligatorio')
+    } else if (formData.name.trim().length < 2) {
+      errors.push('Il nome deve essere di almeno 2 caratteri')
+    } else if (formData.name.trim().length > 255) {
+      errors.push('Il nome non può superare i 255 caratteri')
+    }
+    
+    // Email obbligatoria e valida
+    if (!formData.email.trim()) {
+      errors.push('L\'email è obbligatoria')
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(formData.email.trim())) {
+        errors.push('Formato email non valido')
+      } else if (formData.email.trim().length > 255) {
+        errors.push('L\'email non può superare i 255 caratteri')
+      }
+    }
+    
+    // Messaggio obbligatorio
+    if (!formData.message.trim()) {
+      errors.push('Il messaggio è obbligatorio')
+    } else if (formData.message.trim().length < 10) {
+      errors.push('Il messaggio deve essere di almeno 10 caratteri')
+    } else if (formData.message.trim().length > 5000) {
+      errors.push('Il messaggio non può superare i 5000 caratteri')
+    }
+    
+    // Oggetto opzionale ma con limite
+    if (formData.subject.trim().length > 255) {
+      errors.push('L\'oggetto non può superare i 255 caratteri')
+    }
+    
+    return errors
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validazione frontend
+    const validationErrors = validateForm()
+    if (validationErrors.length > 0) {
+      alert('Errori di validazione:\n\n' + validationErrors.join('\n'))
+      return
+    }
+    
     setIsSubmitting(true)
     
     try {
       // Send message via API
       await contactService.sendMessage({
-        name: formData.name,
-        email: formData.email,
-        subject: formData.subject || 'Contatto dal portfolio',
-        message: formData.message,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim() || 'Contatto dal portfolio',
+        message: formData.message.trim(),
         budget: formData.budget || null,
         timeline: formData.timeline || null,
         projectType: formData.projectType || null
@@ -76,8 +125,6 @@ const Contact = () => {
     } catch (error) {
       console.error('Error sending message:', error)
       setSubmitStatus('error')
-      
-      // Reset error status after 5 seconds
       setTimeout(() => {
         setSubmitStatus(null)
       }, 5000)

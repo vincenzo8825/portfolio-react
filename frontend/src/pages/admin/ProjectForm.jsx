@@ -56,17 +56,18 @@ const ProjectForm = () => {
 
   const loadTechnologies = async () => {
     try {
-      const technologies = await technologiesService.getAll()
-      setAvailableTechnologies(technologies)
+      const data = await technologiesService.getAll();
+      setAvailableTechnologies(data);
     } catch (err) {
-      console.error('Error loading technologies:', err)
+      console.error('Error loading technologies:', err);
     }
-  }
+  };
 
   const loadProject = async () => {
     try {
-      setInitialLoading(true)
-      const project = await projectsService.getById(id)
+      setLoading(true);
+      const project = await projectsService.getById(id);
+      
       setFormData({
         title: project.title || '',
         description: project.description || '',
@@ -76,8 +77,8 @@ const ProjectForm = () => {
         github_url: project.github_url || '',
         linkedin_url: project.linkedin_url || '',
         video_url: project.video_url || '',
-        technologies: project.technologies || [],
-        status: project.status || 'in-progress',
+        technologies: project.technologies?.map(tech => tech.id) || [],
+        status: project.status || 'active',
         featured: Boolean(project.featured),
         project_date: project.project_date || new Date().toISOString().split('T')[0],
         client: project.client || '',
@@ -88,15 +89,15 @@ const ProjectForm = () => {
         results: project.results || [],
         gallery: project.gallery || [],
         additional_links: project.additional_links || []
-      })
+      });
     } catch (err) {
-      console.error('Error loading project:', err)
-      showError('Errore nel caricamento del progetto')
-      navigate('/admin/projects')
+      console.error('Error loading project:', err);
+      setError('Errore nel caricamento del progetto');
+      navigate('/admin/projects');
     } finally {
-      setInitialLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Handle form changes
   const handleChange = (e) => {
@@ -132,13 +133,25 @@ const ProjectForm = () => {
     }))
   }
 
-  const handleGalleryUpload = (results) => {
-    const newImages = Array.isArray(results) ? results.map(r => r.url) : [results.url]
-    setFormData(prev => ({
-      ...prev,
-      gallery: [...prev.gallery, ...newImages]
-    }))
-  }
+  const handleGalleryUpload = async (results) => {
+    console.log('🔧 handleGalleryUpload - Received results:', results);
+    
+    if (!results || results.length === 0) return;
+
+    const newImages = results
+      .filter(result => result && (result.url || result.secure_url))
+      .map(result => result.url || result.secure_url);
+
+    if (newImages.length > 0) {
+      console.log('✅ Adding images to gallery:', newImages);
+      setFormData(prev => ({
+        ...prev,
+        gallery: [...(prev.gallery || []), ...newImages]
+      }));
+    } else {
+      console.error('❌ Formato risultato non riconosciuto:', results);
+    }
+  };
 
   // Handle array additions
   const addFeature = () => {
@@ -219,25 +232,26 @@ const ProjectForm = () => {
 
   // Handle form submit
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-
+    e.preventDefault();
+    
     try {
+      setLoading(true);
+      
       if (isEditMode) {
-        await projectsService.update(id, formData)
-        showSuccess('Progetto aggiornato con successo!')
+        await projectsService.update(id, formData);
       } else {
-        await projectsService.create(formData)
-        showSuccess('Progetto creato con successo!')
+        await projectsService.create(formData);
       }
-      navigate('/admin/projects')
+      
+      setSuccess(`Progetto ${isEditMode ? 'aggiornato' : 'creato'} con successo!`);
+      navigate('/admin/projects');
     } catch (err) {
-      console.error('Error saving project:', err)
-      showError(err.message || `Errore nel ${isEditMode ? 'aggiornamento' : 'salvataggio'} del progetto`)
+      console.error('Error saving project:', err);
+      setError(err.message || `Errore nel ${isEditMode ? 'aggiornamento' : 'salvataggio'} del progetto`);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (initialLoading) {
     return (
@@ -884,8 +898,6 @@ const ProjectForm = () => {
               </button>
             </div>
           </div>
-
-
 
           {/* Actions */}
           <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">

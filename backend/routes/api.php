@@ -38,7 +38,7 @@ Route::prefix('v1/auth')->group(function () {
 });
 
 // Rotte pubbliche (senza autenticazione)
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:60,1')->group(function () {
 
     // Test route
     Route::get('/test', function () {
@@ -46,22 +46,30 @@ Route::prefix('v1')->group(function () {
             'message' => 'Laravel API funziona su Hostinger!',
             'timestamp' => now(),
             'server' => request()->server('SERVER_NAME'),
-            'php_version' => PHP_VERSION
+            'php_version' => PHP_VERSION,
+            'environment' => app()->environment()
         ]);
     });
 
-    // Progetti - rotte pubbliche
-    Route::get('/projects', [ProjectController::class, 'index']);
-    Route::get('/projects/featured', [ProjectController::class, 'featured']);
-    Route::get('/projects/{id}', [ProjectController::class, 'show']);
+    // Progetti - rotte pubbliche con rate limiting
+    Route::get('/projects', [ProjectController::class, 'index'])
+        ->middleware('throttle:30,1');
+    Route::get('/projects/featured', [ProjectController::class, 'featured'])
+        ->middleware('throttle:30,1');
+    Route::get('/projects/{id}', [ProjectController::class, 'show'])
+        ->middleware('throttle:30,1');
 
-    // Tecnologie - rotte pubbliche
-    Route::get('/technologies', [TechnologyController::class, 'index']);
-    Route::get('/technologies/featured', [TechnologyController::class, 'featured']);
-    Route::get('/technologies/by-category', [TechnologyController::class, 'byCategory']);
-    Route::get('/technologies/{id}', [TechnologyController::class, 'show']);
+    // Tecnologie - rotte pubbliche con rate limiting
+    Route::get('/technologies', [TechnologyController::class, 'index'])
+        ->middleware('throttle:30,1');
+    Route::get('/technologies/featured', [TechnologyController::class, 'featured'])
+        ->middleware('throttle:30,1');
+    Route::get('/technologies/by-category', [TechnologyController::class, 'byCategory'])
+        ->middleware('throttle:30,1');
+    Route::get('/technologies/{id}', [TechnologyController::class, 'show'])
+        ->middleware('throttle:30,1');
 
-    // Contatti - solo creazione pubblica con rate limiting
+    // Contatti - solo creazione pubblica con rate limiting severo
     Route::post('/contacts', [ContactController::class, 'store'])
         ->middleware('throttle:3,60'); // Max 3 messaggi per ora
 });

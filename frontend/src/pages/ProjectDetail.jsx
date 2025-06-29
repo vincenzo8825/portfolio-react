@@ -15,6 +15,7 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
+  const [error, setError] = useState(null)
 
   // Dynamic title
   useDocumentTitle(project ? `${project.title}` : 'Progetto', [project?.title])
@@ -77,57 +78,43 @@ const ProjectDetail = () => {
   const getText = (key) => translations[language]?.[key] || translations.it[key]
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        console.log('Fetching project with ID:', id)
-        setLoading(true)
-        const projectData = await projectsService.getById(id)
-        console.log('Project data received:', projectData)
-        
-        // Use real data from database instead of mock data
-        const enhancedProject = {
-          ...projectData,
-          // Images - use gallery if available, otherwise fallback to single image
-          images: projectData.gallery && projectData.gallery.length > 0 
-            ? projectData.gallery 
-            : (projectData.image_url ? [projectData.image_url] : []),
-          // Technologies
-          tech: projectData.technologies || [],
-          // URLs
-          demo: projectData.demo_url,
-          github: projectData.github_url,
-          linkedin: projectData.linkedin_url,
-          // Descriptions
-          longDescription: projectData.long_description || projectData.description,
-          // Project details from database
-          client: projectData.client || "Portfolio Project",
-          duration: projectData.duration || "Variable",
-          category: projectData.category || "Web Development",
-          // Arrays from database
-          features: projectData.features || [],
-          challenges: projectData.challenges || [],
-          results: projectData.results || [],
-          // Additional data
-          video: projectData.video_url,
-          additionalLinks: projectData.additional_links || []
-        }
-        
-        console.log('Enhanced project:', enhancedProject)
-        setProject(enhancedProject)
-      } catch (error) {
-        console.error('Error fetching project:', error)
-        console.error('Error details:', error.response?.data || error.message)
-        showError(translations[language]?.errorLoading || translations.it.errorLoading)
-        setProject(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     if (id) {
-      fetchProject()
+      (async () => {
+        try {
+          console.log('Fetching project with ID:', id);
+          setLoading(true);
+          const projectData = await projectsService.getById(id);
+          console.log('Project data received:', projectData);
+          
+          const enhancedProject = {
+            ...projectData,
+            images: projectData.gallery && projectData.gallery.length > 0 
+              ? projectData.gallery 
+              : projectData.image_url 
+                ? [projectData.image_url] 
+                : [],
+            tech: projectData.technologies || [],
+            demo: projectData.demo_url,
+            github: projectData.github_url,
+            linkedin: projectData.linkedin_url,
+            additionalLinks: projectData.additional_links || []
+          };
+          
+          console.log('Enhanced project:', enhancedProject);
+          console.log('Project images array:', enhancedProject.images);
+          console.log('Images count:', enhancedProject.images ? enhancedProject.images.length : 0);
+          setProject(enhancedProject);
+        } catch (error) {
+          console.error('Error fetching project:', error);
+          console.error('Error details:', error.response?.data || error.message);
+          setError(translations[language]?.errorLoading || translations.it.errorLoading);
+          setProject(null);
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
-  }, [id, showError, language])
+  }, [id, setError, language]);
 
   const nextImage = () => {
     if (project && project.images && project.images.length > 0) {
@@ -202,12 +189,19 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Hero Section */}
-      <section className="pt-20 pb-12 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-80 h-80 bg-gradient-to-r from-primary-400/10 to-accent-400/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-accent-400/10 to-pink-400/10 rounded-full blur-3xl"></div>
+      <section className="pt-20 pb-12 bg-gradient-to-br from-primary-50/50 via-white to-accent-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-20 w-80 h-80 bg-gradient-to-r from-primary-400/10 to-accent-400/10 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-accent-400/10 to-pink-400/10 rounded-full blur-3xl animate-float-slow"></div>
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-20 dark:opacity-10">
+          <div className="h-full w-full bg-[linear-gradient(rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -326,14 +320,35 @@ const ProjectDetail = () => {
             </div>
 
             {/* Main Project Image */}
-            <div className="relative">
-              <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl shadow-black/20 dark:shadow-black/40">
+            <div className="relative group">
+              <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl shadow-black/20 dark:shadow-black/40 transform group-hover:scale-[1.02] transition-all duration-500">
                 <img
-                  src={project.images[0]}
+                  src={project.images && project.images.length > 0 ? project.images[0] : project.image_url || '/placeholder-project.jpg'}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-accent-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                {/* Overlay with project stats */}
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-1">
+                      <i className="fas fa-calendar text-sm"></i>
+                      <span className="text-sm font-medium">{project.year || new Date(project.created_at).getFullYear()}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <i className="fas fa-code text-sm"></i>
+                      <span className="text-sm font-medium">{project.tech?.length || 0} Tech</span>
+                    </div>
+                  </div>
+                  {project.images && project.images.length > 1 && (
+                    <div className="flex items-center space-x-1 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
+                      <i className="fas fa-images text-sm"></i>
+                      <span className="text-sm font-medium">{project.images.length}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -465,17 +480,17 @@ const ProjectDetail = () => {
                     )}
                   </div>
 
-                  {/* Thumbnail Gallery - Solo se più di un'immagine */}
+                  {/* Thumbnail Gallery - Tutte le immagini caricate */}
                   {project.images.length > 1 && (
-                    <div className="flex gap-3 overflow-x-auto pb-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                       {project.images.map((image, index) => (
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                          className={`aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 ${
                             index === currentImageIndex 
-                              ? 'border-primary-500 scale-105' 
-                              : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
+                              ? 'border-primary-500 scale-105 ring-2 ring-primary-500/30' 
+                              : 'border-gray-300 dark:border-gray-600 hover:border-primary-400 hover:scale-105'
                           }`}
                         >
                           <img
@@ -488,6 +503,16 @@ const ProjectDetail = () => {
                           />
                         </button>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Info numero immagini totali */}
+                  {project.images.length > 1 && (
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <i className="fas fa-images mr-2"></i>
+                        {project.images.length} immagini nella galleria
+                      </p>
                     </div>
                   )}
                 </div>

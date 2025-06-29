@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:prod": "vite build --mode production",
+    "preview:prod": "vite preview --host",
+    "deploy:hostinger": "npm run build:prod && cp -r dist/* ../public_html_final/"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

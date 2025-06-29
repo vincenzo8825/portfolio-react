@@ -41,7 +41,10 @@ const Login = () => {
       
       if (result.success) {
         showSuccess('Login effettuato con successo!')
-        navigate(from, { replace: true })
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          navigate(from, { replace: true })
+        }, 100)
       } else {
         showError(result.message || 'Credenziali non valide. Riprova.')
       }

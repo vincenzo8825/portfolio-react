@@ -29,13 +29,13 @@ const Home = () => {
   const loadFeaturedProjects = async () => {
     try {
       setLoading(true)
-      const projects = await projectsService.getAll()
-      // Filtra solo progetti featured e prendi i primi 3
-      const featured = projects.filter(project => project.featured).slice(0, 3)
-      setFeaturedProjects(featured)
+      console.log('🏠 Loading featured projects for Home...')
+      const featured = await projectsService.getFeatured()
+      console.log('🏠 Featured projects loaded:', featured.length)
+      setFeaturedProjects(featured.slice(0, 3))
     } catch (error) {
-      console.error('Error loading featured projects:', error)
-      setFeaturedProjects([]) // Fallback a array vuoto
+      console.error('❌ Error loading featured projects:', error)
+      setFeaturedProjects([])
     } finally {
       setLoading(false)
     }
@@ -217,7 +217,7 @@ const Home = () => {
                       {/* Tech Stack */}
                       {project.technologies && project.technologies.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {project.technologies.slice(0, 4).map((tech, techIndex) => (
+                          {(project.technologies || []).slice(0, 4).map((tech, techIndex) => (
                             <span
                               key={techIndex}
                               className="px-3 py-1 bg-gradient-to-r from-primary-500/10 to-accent-500/10 text-primary-700 dark:text-primary-300 text-xs rounded-full border border-primary-200/30 dark:border-primary-700/30"
@@ -234,26 +234,15 @@ const Home = () => {
                       )}
                     </div>
 
-                    {/* Action Buttons - Fixed at bottom */}
-                    <div className="flex gap-3 mt-auto">
+                    {/* Action Buttons - Solo bottone Dettagli */}
+                    <div className="flex justify-center mt-auto">
                       <Link
                         to={`/projects/${project.slug || project.id}`}
-                        className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-2xl font-medium hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 text-center flex items-center justify-center cursor-pointer relative z-10"
+                        className="w-full py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-2xl font-medium hover:from-primary-600 hover:to-accent-600 transition-all duration-300 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 text-center flex items-center justify-center cursor-pointer relative z-10"
                       >
                         {t('details')}
                         <i className="fas fa-info-circle ml-2"></i>
                       </Link>
-                      {project.demo_url && (
-                        <a
-                          href={project.demo_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-3 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-2xl font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-300 shadow-lg border border-gray-200 dark:border-slate-600 flex items-center justify-center"
-                          title="Vedi Demo"
-                        >
-                          <i className="fas fa-external-link-alt"></i>
-                        </a>
-                      )}
                     </div>
                   </div>
 

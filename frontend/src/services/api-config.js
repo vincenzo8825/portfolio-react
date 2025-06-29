@@ -1,286 +1,151 @@
-// API configuration per Laravel backend su Hostinger
-// TEMPORANEO: Test diretto Hostinger (trova IP reale)
+// Configurazione API per comunicazione DIRETTA con Laravel Backend (senza interceptor)
 const API_BASE_URL = 'https://vincenzorocca.com/api/v1'
 
-// Helper per le chiamate API Laravel
-export const directAPI = {
+// API diretta senza simulazioni - Comunicazione reale con Laravel
+const directAPI = {
   async callEndpoint(endpoint, method = 'GET', data = null) {
-    const url = `${API_BASE_URL}/${endpoint}`
-    
-    const options = {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    }
-    
-    // Aggiungi token se disponibile
-    const token = localStorage.getItem('auth-token')
-    if (token) {
-      options.headers.Authorization = `Bearer ${token}`
-    }
-    
-    // Aggiungi body per POST/PUT
-    if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-      options.body = JSON.stringify(data)
-    }
-    
     try {
-      const response = await fetch(url, options)
+      const url = `${API_BASE_URL}/${endpoint}`
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const options = {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       }
       
+      // Aggiungi token di autenticazione se disponibile
+      const token = localStorage.getItem('auth-token')
+      if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`
+      }
+      
+      if (data) {
+        options.body = JSON.stringify(data)
+      }
+      
+      const response = await fetch(url, options)
       const result = await response.json()
+      
       return result
     } catch (error) {
-      console.error(`API Error for ${endpoint}:`, error)
       throw error
     }
   },
 
-  // Metodi specifici
   async login(credentials) {
-    return await this.callEndpoint('login', 'POST', credentials)
+    return this.callEndpoint('auth/login', 'POST', credentials)
   },
 
   async getProjects() {
-    return await this.callEndpoint('projects', 'GET')
+    return this.callEndpoint('projects')
   },
 
   async getFeaturedProjects() {
-    return await this.callEndpoint('projects/featured', 'GET')
+    return this.callEndpoint('projects/featured')
   },
 
   async getTechnologies() {
-    return await this.callEndpoint('technologies', 'GET')
+    return this.callEndpoint('technologies')
   },
 
   async sendContact(contactData) {
-    // Usa l'API Laravel per i contatti
-    const url = `${API_BASE_URL}/contacts`
-    
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(contactData)
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Contact API Error:', error)
-      throw error
-    }
+    return this.callEndpoint('contacts', 'POST', contactData)
   },
 
   async getCurrentUser() {
-    return await this.callEndpoint('auth/me', 'GET')
+    return this.callEndpoint('auth/me')
   },
 
-  // NUOVI METODI PER PROGETTI ADMIN
   async createProject(projectData) {
-    const url = `${API_BASE_URL}/admin/projects`
-    
-    const token = localStorage.getItem('auth-token')
-    
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(projectData)
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Create Project API Error:', error)
-      throw error
-    }
+    return this.callEndpoint('admin/projects', 'POST', projectData)
   },
 
   async updateProject(id, projectData) {
-    const url = `${API_BASE_URL}/admin/projects/${id}`
-    
-    const token = localStorage.getItem('auth-token')
-    
-    try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(projectData)
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Update Project API Error:', error)
-      throw error
-    }
+    return this.callEndpoint(`admin/projects/${id}`, 'PUT', projectData)
   },
 
   async getProjectById(id) {
-    const url = `${API_BASE_URL}/admin/projects/${id}`
-    
-    const token = localStorage.getItem('auth-token')
-    
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Get Project API Error:', error)
-      throw error
-    }
+    return this.callEndpoint(`projects/${id}`)
   },
 
-  // UPLOAD IMMAGINI
   async uploadImage(imageFile) {
-    const url = `${API_BASE_URL}/admin/upload/image`
-    
-    const token = localStorage.getItem('auth-token')
     const formData = new FormData()
     formData.append('image', imageFile)
     
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Upload Image API Error:', error)
-      throw error
-    }
+    const token = localStorage.getItem('auth-token')
+    const url = `${API_BASE_URL}/admin/upload/image`
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      body: formData
+    })
+    
+    return response.json()
   },
 
   async uploadVideo(videoFile) {
-    const url = `${API_BASE_URL}/api/v1/admin/upload/image` // Usa lo stesso endpoint
+    const formData = new FormData()
+    formData.append('video', videoFile)
     
     const token = localStorage.getItem('auth-token')
-    const formData = new FormData()
-    formData.append('image', videoFile) // L'endpoint accetta qualsiasi file
+    const url = `${API_BASE_URL}/admin/upload/video`
     
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData
-      })
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-      
-      const result = await response.json()
-      return result
-    } catch (error) {
-      console.error('Upload Video API Error:', error)
-      throw error
-    }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      body: formData
+    })
+    
+    return response.json()
   },
 
   async uploadGallery(imageFiles) {
-    // Per la galleria, carica un'immagine alla volta
-    const results = []
+    const formData = new FormData()
+    imageFiles.forEach((file, index) => {
+      formData.append(`images[${index}]`, file)
+    })
     
-    for (const file of imageFiles) {
-      try {
-        const result = await this.uploadImage(file)
-        if (result.success) {
-          results.push(result.data)
-        }
-      } catch (error) {
-        console.error('Gallery upload error for file:', file.name, error)
-      }
-    }
+    const token = localStorage.getItem('auth-token')
+    const url = `${API_BASE_URL}/admin/upload/gallery`
     
-    return {
-      success: true,
-      data: results
-    }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      },
+      body: formData
+    })
+    
+    return response.json()
   }
 }
 
-// Override del servizio di autenticazione per usare l'API diretta
+// Servizio di autenticazione reale
 export const authServiceOverride = {
   async login(credentials) {
     try {
       const response = await directAPI.login(credentials)
       
-      if (response.success) {
-        // Salva il token
-        if (response.token) {
-          this.setToken(response.token)
-        }
-        return {
-          success: true,
-          data: {
-            user: response.user,
-            token: response.token
-          }
-        }
+      // L'API risponde direttamente con {user: {...}, token: "..."} 
+      if (response.user && response.token) {
+        localStorage.setItem('auth-token', response.token)
+        localStorage.setItem('current-user', JSON.stringify(response.user))
+        return { success: true, data: response }
       } else {
-        return {
-          success: false,
-          message: response.message || 'Login fallito'
-        }
+        throw new Error('Login failed - Invalid response format')
       }
     } catch (error) {
-      console.error('Login error:', error)
-      return {
-        success: false,
-        message: 'Errore di connessione. Riprova più tardi.'
-      }
+      throw error
     }
   },
 
@@ -288,36 +153,31 @@ export const authServiceOverride = {
     try {
       const response = await directAPI.getCurrentUser()
       
-      if (response.success) {
-        return response.user
+      // L'API risponde direttamente con {id: 1, name: "...", is_admin: true}
+      if (response.id && response.email) {
+        localStorage.setItem('current-user', JSON.stringify(response))
+        return response
       } else {
-        throw new Error(response.message || 'Errore nel recupero utente')
+        throw new Error('User not found - Invalid response format')
       }
     } catch (error) {
-      console.error('Get user error:', error)
       throw error
     }
   },
 
   async logout() {
-    // Per ora solo rimuove il token localmente
-    this.removeToken()
+    localStorage.removeItem('auth-token')
+    localStorage.removeItem('current-user')
   },
 
-  // Gestione token (copiata dal servizio originale)
   setToken(token) {
-    const tokenData = {
-      token: token,
-      timestamp: Date.now(),
-      expires: Date.now() + (24 * 60 * 60 * 1000) // 24 ore
+    if (token) {
+      localStorage.setItem('auth-token', token)
     }
-    localStorage.setItem('auth-token', token)
-    localStorage.setItem('auth-token-data', JSON.stringify(tokenData))
   },
 
   removeToken() {
     localStorage.removeItem('auth-token')
-    localStorage.removeItem('auth-token-data')
   },
 
   getToken() {
@@ -325,41 +185,40 @@ export const authServiceOverride = {
   },
 
   isAuthenticated() {
-    return !!localStorage.getItem('auth-token')
+    const token = this.getToken()
+    return !!token
   }
 }
 
-// Override del servizio delle tecnologie
+// Servizio tecnologie reale
 export const technologiesServiceOverride = {
   async getAll() {
     try {
       const response = await directAPI.getTechnologies()
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nel caricamento tecnologie')
+      if (Array.isArray(response)) {
+        return response
       }
+      
+      throw new Error('Failed to load technologies - Invalid response format')
     } catch (error) {
-      console.error('Technologies error:', error)
       throw error
     }
   }
 }
 
-// Override del servizio progetti
+// Servizio progetti reale
 export const projectsServiceOverride = {
   async getAll() {
     try {
       const response = await directAPI.getProjects()
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nel caricamento progetti')
+      if (Array.isArray(response)) {
+        return response
       }
+      
+      throw new Error('Failed to load projects - Invalid response format')
     } catch (error) {
-      console.error('Projects error:', error)
       throw error
     }
   },
@@ -368,13 +227,12 @@ export const projectsServiceOverride = {
     try {
       const response = await directAPI.getProjectById(id)
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nel caricamento progetto')
+      if (response.id) {
+        return response
       }
+      
+      throw new Error('Failed to load project - Invalid response format')
     } catch (error) {
-      console.error('Project by ID error:', error)
       throw error
     }
   },
@@ -383,13 +241,12 @@ export const projectsServiceOverride = {
     try {
       const response = await directAPI.createProject(projectData)
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nella creazione progetto')
+      if (response.id) {
+        return response
       }
+      
+      throw new Error('Failed to create project - Invalid response format')
     } catch (error) {
-      console.error('Create project error:', error)
       throw error
     }
   },
@@ -400,29 +257,73 @@ export const projectsServiceOverride = {
       
       if (response.success) {
         return response.data
-      } else {
-        throw new Error(response.message || 'Errore nell\'aggiornamento progetto')
       }
+      
+      throw new Error(response.message || 'Failed to update project')
     } catch (error) {
-      console.error('Update project error:', error)
+      throw error
+    }
+  },
+
+  async delete(id) {
+    try {
+      const response = await directAPI.callEndpoint(`admin/projects/${id}`, 'DELETE')
+      
+      if (response.success) {
+        return response
+      }
+      
+      throw new Error(response.message || 'Failed to delete project')
+    } catch (error) {
+      throw error
+    }
+  },
+
+  async toggleFeatured(id) {
+    try {
+      const response = await directAPI.callEndpoint(`admin/projects/${id}/toggle-featured`, 'PATCH')
+      
+      if (response.success && response.data) {
+        return response.data
+      }
+      
+      throw new Error('Failed to toggle featured status')
+    } catch (error) {
+      throw error
+    }
+  },
+
+  async getFeatured() {
+    try {
+      const response = await directAPI.getFeaturedProjects()
+      
+      if (response.success && Array.isArray(response.data)) {
+        return response.data
+      }
+      
+      if (Array.isArray(response)) {
+        return response
+      }
+      
+      throw new Error('Failed to load featured projects - Invalid response format')
+    } catch (error) {
       throw error
     }
   }
 }
 
-// Override del servizio upload
+// Servizio upload reale
 export const uploadServiceOverride = {
   async uploadImage(imageFile) {
     try {
       const response = await directAPI.uploadImage(imageFile)
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nell\'upload immagine')
+      if (response.success && response.url) {
+        return { url: response.url }
       }
+      
+      throw new Error('Failed to upload image - Invalid response format')
     } catch (error) {
-      console.error('Upload image error:', error)
       throw error
     }
   },
@@ -431,13 +332,12 @@ export const uploadServiceOverride = {
     try {
       const response = await directAPI.uploadVideo(videoFile)
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nell\'upload video')
+      if (response.success && response.url) {
+        return { url: response.url }
       }
+      
+      throw new Error('Failed to upload video - Invalid response format')
     } catch (error) {
-      console.error('Upload video error:', error)
       throw error
     }
   },
@@ -446,13 +346,29 @@ export const uploadServiceOverride = {
     try {
       const response = await directAPI.uploadGallery(imageFiles)
       
-      if (response.success) {
-        return response.data
-      } else {
-        throw new Error(response.message || 'Errore nell\'upload galleria')
+      if (response.success && response.urls) {
+        return { urls: response.urls }
       }
+      
+      throw new Error('Failed to upload gallery - Invalid response format')
     } catch (error) {
-      console.error('Upload gallery error:', error)
+      throw error
+    }
+  }
+}
+
+// Servizio contatti reale
+export const contactServiceOverride = {
+  async sendMessage(contactData) {
+    try {
+      const response = await directAPI.sendContact(contactData)
+      
+      if (response.success) {
+        return response
+      }
+      
+      throw new Error('Failed to send message - Invalid response format')
+    } catch (error) {
       throw error
     }
   }
