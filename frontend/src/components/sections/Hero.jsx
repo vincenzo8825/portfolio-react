@@ -1,6 +1,42 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
+
+// Sposto le funzioni fuori dal componente per evitare re-render infiniti
+const generateParticles = () => {
+  return Array.from({ length: 80 }, (_, i) => (
+    <div
+      key={i}
+      className="particle"
+      style={{
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 15}s`,
+        animationDuration: `${15 + Math.random() * 10}s`,
+        '--particle-color': i % 3 === 0 ? '#3b82f6' : i % 3 === 1 ? '#8b5cf6' : '#ec4899'
+      }}
+    />
+  ))
+}
+
+const generateOrbs = () => {
+  return Array.from({ length: 12 }, (_, i) => (
+    <div
+      key={`orb-${i}`}
+      className={`
+        absolute rounded-full opacity-20 animate-float
+        ${i % 4 === 0 ? 'w-32 h-32 bg-blue-500' : 
+          i % 4 === 1 ? 'w-24 h-24 bg-purple-500' : 
+          i % 4 === 2 ? 'w-20 h-20 bg-pink-500' : 'w-28 h-28 bg-indigo-500'}
+      `}
+      style={{
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${8 + Math.random() * 4}s`
+      }}
+    />
+  ))
+}
 
 const Hero = () => {
   const { t } = useLanguage()
@@ -20,8 +56,11 @@ const Hero = () => {
     'Laravel & PHP',
     'MySQL & Database',
     'SASS & Tailwind CSS',
-    
   ]
+
+  // Memorizzo i particles e orbs per evitare re-render
+  const particles = useMemo(() => generateParticles(), [])
+  const orbs = useMemo(() => generateOrbs(), [])
 
   useEffect(() => {
     setIsVisible(true)
@@ -67,7 +106,10 @@ const Hero = () => {
     }
 
     // Inizia l'animazione dopo 2 secondi dall'apertura del sito
-    setTimeout(startCounters, 2000)
+    const timeout = setTimeout(startCounters, 2000)
+    
+    // Cleanup del timeout
+    return () => clearTimeout(timeout)
   }, [])
 
   // Typing animation effect
@@ -88,44 +130,7 @@ const Hero = () => {
     }, 100)
 
     return () => clearInterval(typingInterval)
-  }, [currentIndex])
-
-  // Generate particles con colori dinamici
-  const generateParticles = () => {
-    return Array.from({ length: 80 }, (_, i) => (
-      <div
-        key={i}
-        className="particle"
-        style={{
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 15}s`,
-          animationDuration: `${15 + Math.random() * 10}s`,
-          '--particle-color': i % 3 === 0 ? '#3b82f6' : i % 3 === 1 ? '#8b5cf6' : '#ec4899'
-        }}
-      />
-    ))
-  }
-
-  // Generate floating orbs
-  const generateOrbs = () => {
-    return Array.from({ length: 12 }, (_, i) => (
-      <div
-        key={`orb-${i}`}
-        className={`
-          absolute rounded-full opacity-20 animate-float
-          ${i % 4 === 0 ? 'w-32 h-32 bg-blue-500' : 
-            i % 4 === 1 ? 'w-24 h-24 bg-purple-500' : 
-            i % 4 === 2 ? 'w-20 h-20 bg-pink-500' : 'w-28 h-28 bg-indigo-500'}
-        `}
-        style={{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 5}s`,
-          animationDuration: `${8 + Math.random() * 4}s`
-        }}
-      />
-    ))
-  }
+  }, [currentIndex, specializations])
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -153,11 +158,11 @@ const Hero = () => {
         </div>
         
         {/* Floating orbs */}
-        {generateOrbs()}
+        {orbs}
         
         {/* Enhanced particles */}
         <div className="particles">
-          {generateParticles()}
+          {particles}
         </div>
 
         {/* Glow effects */}
