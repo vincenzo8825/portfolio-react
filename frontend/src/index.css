@@ -445,7 +445,8 @@ body {
 /* Responsive utilities */
 @media (max-width: 640px) {
   .container {
-    @apply px-4;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
   
   .particle {
@@ -454,21 +455,59 @@ body {
   }
   
   .stats-card {
-    @apply p-3;
+    padding: 0.75rem;
   }
   
   .btn-primary,
   .btn-secondary {
-    @apply px-6 py-3 text-sm;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 
-  /* Masonry adjustments for mobile */
   .columns-1 {
     column-count: 1;
   }
   
   .columns-2 {
     column-count: 1;
+  }
+
+  /* Miglioramenti per le statistiche su mobile */
+  .stats-card {
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  /* Scroll button mobile optimization */
+  .scroll-button-mobile {
+    position: fixed !important;
+    bottom: 1rem !important;
+    right: 1rem !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 15 !important;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Forza visibilità contatori su mobile */
+  .mobile-counter-force {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: all 0.3s ease-in-out !important;
+  }
+
+  /* Grid responsive per stats */
+  .stats-grid-mobile {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  /* Riduce padding eccessivo su mobile */
+  .mobile-spacing {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
   }
 }
 

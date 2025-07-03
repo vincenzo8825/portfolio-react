@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useLanguage } from '../../context/LanguageContext'
 
 const TechStack = () => {
   const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState('frontend')
+  const sectionRef = useRef(null)
+  
+  // Configurazione ottimizzata per mobile e desktop
   const [ref, inView] = useInView({
-    threshold: 0.3,
+    threshold: [0.1, 0.2, 0.3], 
+    rootMargin: '-50px 0px -50px 0px', 
     triggerOnce: true
   })
 
@@ -17,52 +21,107 @@ const TechStack = () => {
   const [backendCount, setBackendCount] = useState(0)
   const [toolsCount, setToolsCount] = useState(0)
   const [showCounters, setShowCounters] = useState(false)
+  const [animationStarted, setAnimationStarted] = useState(false)
 
-  // Animation logic for counters
+  // Fallback scroll-based detection ottimizzato per mobile
   useEffect(() => {
-    if (inView && !showCounters) {
-      setShowCounters(true)
-      
-      const totalTech = techData.frontend.length + techData.backend.length + techData.tools.length
-      const avgSkill = Math.round([...techData.frontend, ...techData.backend, ...techData.tools].reduce((acc, tech) => acc + tech.level, 0) / totalTech)
-      
-      // Animate counters with different delays
-      setTimeout(() => {
-        animateNumber(setTechCount, totalTech, 1500)
-      }, 200)
-      
-      setTimeout(() => {
-        animateNumber(setAvgSkillCount, avgSkill, 1500)
-      }, 400)
-      
-      setTimeout(() => {
-        animateNumber(setFrontendCount, techData.frontend.length, 1000)
-      }, 600)
-      
-      setTimeout(() => {
-        animateNumber(setBackendCount, techData.backend.length, 1000)
-      }, 800)
-      
-      setTimeout(() => {
-        animateNumber(setToolsCount, techData.tools.length, 1000)
-      }, 1000)
-    }
-  }, [inView, showCounters])
+    const handleScroll = () => {
+      if (animationStarted) return // Se già animato, non rifare
 
-  // Helper function to animate numbers
+      const element = sectionRef.current || ref.current
+      if (!element) return
+
+      const rect = element.getBoundingClientRect()
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight
+      
+      // Controllo più ampio per mobile - se qualsiasi parte della sezione è visibile
+      const isVisible = rect.top < windowHeight * 0.9 && rect.bottom > windowHeight * 0.1
+      
+      if (isVisible && !animationStarted) {
+        startCounterAnimation()
+      }
+    }
+
+    // Controllo immediato al mount
+    setTimeout(handleScroll, 100)
+    
+    // Aggiunge listener solo se l'animazione non è ancora partita
+    if (!animationStarted) {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      window.addEventListener('resize', handleScroll, { passive: true })
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
+  }, [animationStarted, ref])
+
+  // Funzione per iniziare l'animazione dei contatori
+  const startCounterAnimation = () => {
+    if (animationStarted) return // Previene doppia animazione
+    
+    setAnimationStarted(true)
+    setShowCounters(true)
+    
+    const totalTech = techData.frontend.length + techData.backend.length + techData.tools.length
+    const avgSkill = Math.round([...techData.frontend, ...techData.backend, ...techData.tools].reduce((acc, tech) => acc + tech.level, 0) / totalTech)
+    
+    // Animate counters with different delays
+    setTimeout(() => {
+      animateNumber(setTechCount, totalTech, 1500)
+    }, 200)
+    
+    setTimeout(() => {
+      animateNumber(setAvgSkillCount, avgSkill, 1500)
+    }, 400)
+    
+    setTimeout(() => {
+      animateNumber(setFrontendCount, techData.frontend.length, 1000)
+    }, 600)
+    
+    setTimeout(() => {
+      animateNumber(setBackendCount, techData.backend.length, 1000)
+    }, 800)
+    
+    setTimeout(() => {
+      animateNumber(setToolsCount, techData.tools.length, 1000)
+    }, 1000)
+  }
+
+  // Animation logic for counters (migliorato per useInView)
+  useEffect(() => {
+    if (inView && !animationStarted) {
+      startCounterAnimation()
+    }
+  }, [inView, animationStarted])
+
+  // Helper function to animate numbers (migliorata e più robusta)
   const animateNumber = (setter, target, duration) => {
     let start = 0
     const increment = target / (duration / 16)
+    let animationFrameId
     
-    const timer = setInterval(() => {
+    const animate = () => {
       start += increment
       if (start >= target) {
         setter(target)
-        clearInterval(timer)
+        return
       } else {
         setter(Math.floor(start))
+        animationFrameId = requestAnimationFrame(animate)
       }
-    }, 16)
+    }
+    
+    animationFrameId = requestAnimationFrame(animate)
+    
+    // Cleanup e fallback
+    setTimeout(() => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+      setter(target)
+    }, duration + 500)
   }
 
   const tabs = [
@@ -117,8 +176,8 @@ const TechStack = () => {
     ]
   }
 
-  return (
-    <section id="tech-stack" className="relative py-20 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden" ref={ref}>
+      return (
+      <section id="tech-stack" className="relative py-20 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 overflow-hidden" ref={(el) => { sectionRef.current = el; ref(el); }}>
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0">
         {/* Multi-layer gradient orbs */}

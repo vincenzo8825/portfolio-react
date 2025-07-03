@@ -396,8 +396,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Enhanced Scroll indicator with auto scroll */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center z-20">
+      {/* Enhanced Scroll indicator with auto scroll - Posizionamento migliorato */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center z-10 sm:block hidden">
         <button
           onClick={() => {
             const nextSection = document.querySelector('#tech-stack') || document.querySelector('section:nth-of-type(2)')
@@ -413,17 +413,44 @@ const Hero = () => {
               })
             }
           }}
-          className="group relative flex flex-col items-center justify-center p-4 rounded-2xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-primary-500/20"
+          className="group relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/30 dark:border-slate-700/40 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-primary-500/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+          aria-label={t('scrollToExplore')}
         >
           <div className="animate-bounce group-hover:animate-none transition-all duration-300">
-            <i className="fas fa-chevron-down text-2xl text-gray-600 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"></i>
+            <i className="fas fa-chevron-down text-xl sm:text-2xl text-gray-600 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"></i>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 font-medium">
+          <p className="text-xs sm:text-xs text-gray-500 dark:text-gray-400 mt-1 sm:mt-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 font-medium">
             {t('scrollToExplore')}
           </p>
           
           {/* Glow effect on hover */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-500/20 to-accent-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+          <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary-500/20 to-accent-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+        </button>
+      </div>
+
+      {/* Mobile scroll button - posizionato diversamente su mobile */}
+      <div className="sm:hidden">
+        <button
+          onClick={() => {
+            const nextSection = document.querySelector('#tech-stack') || document.querySelector('section:nth-of-type(2)')
+            if (nextSection) {
+              nextSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+              })
+            } else {
+              window.scrollBy({ 
+                top: window.innerHeight, 
+                behavior: 'smooth' 
+              })
+            }
+          }}
+          className="scroll-button-mobile group relative flex items-center justify-center rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:bg-primary-500/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+          aria-label={t('scrollToExplore')}
+        >
+          <div className="animate-bounce group-hover:animate-none transition-all duration-300">
+            <i className="fas fa-chevron-down text-lg text-gray-600 dark:text-gray-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"></i>
+          </div>
         </button>
       </div>
     </section>
