@@ -35,7 +35,7 @@ Un portfolio moderno e responsive sviluppato con React.js e Laravel, che mostra 
 - **MySQL** - Database
 - **Cloudinary** - Cloud storage
 - **Laravel Sanctum** - API Authentication
-- **Mailgun** - Email service
+- **Gmail SMTP** - Email service
 
 ## 📱 Sezioni del Portfolio
 
